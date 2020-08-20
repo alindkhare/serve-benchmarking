@@ -88,7 +88,7 @@ for plength in pipeline_lengths:
 
     duration = end_time - start_time
 
-    qps = args.num_queries / duration
+    qps = args.num_requests / duration
     print(f"Throughput calculated: {qps} QPS pipeline: {plength} ")
     throughput_values.append(qps)
 
