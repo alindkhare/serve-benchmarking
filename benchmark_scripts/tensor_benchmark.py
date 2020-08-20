@@ -9,6 +9,7 @@ import tensorflow as tf
 import numpy as np
 import time
 import json
+import ray
 
 
 @serve_benchmark.accept_batch
