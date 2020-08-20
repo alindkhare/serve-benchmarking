@@ -51,11 +51,11 @@ class Chain:
 
 
 parser = argparse.ArgumentParser("Bechnmark Configs")
-parser.add_argument("-h", "--height", default=224, type=int,
+parser.add_argument("-H", "--height", default=224, type=int,
                     help="Height of Tensor: [hxwxc]")
-parser.add_argument("-w", "--width", default=224, type=int,
+parser.add_argument("-W", "--width", default=224, type=int,
                     help="Height of Tensor: [hxwxc]")
-parser.add_argument("-c", "--channel", default=3, type=int,
+parser.add_argument("-C", "--channel", default=3, type=int,
                     help="channel of Tensor: [hxwxc]")
 parser.add_argument("-b", "--max-batch-size", default=1, type=int)
 parser.add_argument("-t", "--tensor-type", default="torch",
