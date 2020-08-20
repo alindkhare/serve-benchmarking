@@ -555,3 +555,10 @@ class route:
         link(name, backend_tag)
 
         return get_handle(name)
+
+
+@_ensure_connected
+def shutdown():
+    global global_state
+    global_state = None
+    ray.shutdown()

@@ -14,6 +14,7 @@ from serve_benchmark.api import (
     get_trace,
     clear_trace,
     using_router,
+    shutdown,
 )  # noqa: E402
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "get_trace",
     "clear_trace",
     "using_router",
+    "shutdown"
 ]
