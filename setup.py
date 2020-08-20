@@ -10,4 +10,5 @@ setup(
     python_requires=">=3.6, <3.8",
     install_requires=[
         "ray[serve]==0.8.5;python_version<'3.8'",
+    ]
 )
