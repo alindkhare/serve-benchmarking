@@ -129,4 +129,4 @@ file_name = (
 )
 
 with open(file_name, "w") as fp:
-    json.dumps(profile_data)
+    json.dump(profile_data, fp)
