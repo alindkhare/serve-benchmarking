@@ -59,8 +59,8 @@ parser.add_argument("-C", "--channel", default=3, type=int,
                     help="channel of Tensor: [hxwxc]")
 parser.add_argument("-b", "--max-batch-size", default=1, type=int)
 parser.add_argument("-t", "--tensor-type", default="torch",
-                    type=int, choices=["torch", "tf", "np"])
-parser.add_argument("-r", "--num-requests", default=2000)
+                    type=str, choices=["torch", "tf", "np"])
+parser.add_argument("-r", "--num-requests", type=int, default=2000)
 
 args = parser.parse_args()
 
