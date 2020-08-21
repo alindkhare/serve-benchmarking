@@ -1,0 +1,8 @@
+__pycache__/
+.DS_Store
+.vscode
+.localstack
+.mypy_cache/
+*.egg-info/
+*.swp
+tags
