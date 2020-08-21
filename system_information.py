@@ -29,5 +29,5 @@ platform_information = {
     **system_information,
     "stats": pustil_information,
 }
-with open("platform_information.json") as fp:
+with open("platform_information.json", "w") as fp:
     json.dump(platform_information, fp)
