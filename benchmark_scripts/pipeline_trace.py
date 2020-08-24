@@ -85,9 +85,7 @@ def main(num_replicas, batch_size, method, filename):
     trace_file = filename or tempfile.mkstemp(suffix=".json")[1]
     with open(trace_file, "w") as f:
         json.dump(serve_benchmark.get_trace(), f)
-    ray.global_state.chrome_tracing_dump(
-        f"ray_trace_{batch_size}-{method}.json"
-    )
+    ray.timeline(f"ray_trace_{batch_size}-{method}.json")
 
     print(f"Serve trace file written to {trace_file}")
 
