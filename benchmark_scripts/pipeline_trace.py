@@ -51,10 +51,10 @@ def main(num_replicas, batch_size, method, filename):
     if method == "chain":
         for i in range(num_queries):
             r = up_handle.options(tracing_metadata={"pipeline-id": i}).remote(
-                sleep_time=0.01, data=image_data
+                data=image_data
             )
             r = down_handle.options(tracing_metadata={"pipeline-id": i}).remote(
-                sleep_time=0.02, data=r  # torch tensor
+                data=r  # torch tensor
             )
             oids.append(r)
     elif method == "group":
