@@ -45,18 +45,21 @@ def main(num_replicas, batch_size, method, filename):
     with serve_benchmark.using_router("down"):
         down_handle = serve_benchmark.get_handle("down")
 
-    start = time.perf_counter()
+    # start = time.perf_counter()
     oids = []
 
     if method == "chain":
+        # closed loop latencies
         for i in range(num_queries):
             r = up_handle.options(tracing_metadata={"pipeline-id": i}).remote(
                 data=image_data
             )
-            r = down_handle.options(tracing_metadata={"pipeline-id": i}).remote(
+            oid = down_handle.options(
+                tracing_metadata={"pipeline-id": i}
+            ).remote(
                 data=r  # torch tensor
             )
-            oids.append(r)
+            ray.wait([oid], 1)
     elif method == "group":
         res = [
             up_handle.options(tracing_metadata={"pipeline-id": i}).remote(
@@ -72,15 +75,14 @@ def main(num_replicas, batch_size, method, filename):
         ]
     else:
         raise RuntimeError("Unreachable")
-    print(f"Submission time {time.perf_counter() - start}")
+    # print(f"Submission time {time.perf_counter() - start}")
 
-    ray.wait(oids, len(oids))
-    end = time.perf_counter()
+    # end = time.perf_counter()
 
-    duration = end - start
-    qps = num_queries / duration
+    # duration = end - start
+    # qps = num_queries / duration
 
-    print(f"Throughput {qps}")
+    # print(f"Throughput {qps}")
 
     trace_file = filename or tempfile.mkstemp(suffix=".json")[1]
     with open(trace_file, "w") as f:
