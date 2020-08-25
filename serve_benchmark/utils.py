@@ -159,17 +159,24 @@ class InMemoryTracer:
         self.sink = []
         self.metadata = defaultdict(dict)
 
-    def add(self, query_id, event):
+    def add(self, query_id, event, router_name=None):
         self.sink.append(
             {
                 "time_us": int(time.time() * 1e6),
                 "query_id": query_id,
                 "event": event,
+                "router_name": router_name,
             }
         )
 
     def add_metadata(self, query_id, **kwargs):
-        self.metadata[query_id].update(kwargs)
+        if "router_name" in kwargs:
+            router_name = kwargs.pop("router_name")
+            router_dictionary = defaultdict(dict)
+            router_dictionary[query_id].update(kwargs)
+            self.metadata[router_name].update(router_dictionary)
+        else:
+            self.metadata[query_id].update(kwargs)
 
     def clear(self):
         self.sink = []

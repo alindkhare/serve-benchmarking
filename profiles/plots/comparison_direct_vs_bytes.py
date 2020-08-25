@@ -149,5 +149,10 @@ for platform in os.listdir(utils.RESULT_DIR):
                         ignore_index=True,
                     )
     print(results)
+    csv_path = os.path.join(
+        utils.RESULT_DIR, platform, "profile_information.csv"
+    )
+    results.to_csv(csv_path)
+
     plot_df(results, platform)
 

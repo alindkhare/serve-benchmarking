@@ -30,6 +30,7 @@ class RayServeHandle:
     def __init__(
         self,
         router_handle,
+        router_name,
         endpoint_name,
         relative_slo_ms=None,
         absolute_slo_ms=None,
@@ -37,6 +38,7 @@ class RayServeHandle:
         tracing_metadata=None,
     ):
         self.router_handle = router_handle
+        self.router_name = router_name
         self.endpoint_name = endpoint_name
         assert relative_slo_ms is None or absolute_slo_ms is None, (
             "Can't specify both " "relative and absolute " "slo's together!"
@@ -44,7 +46,9 @@ class RayServeHandle:
         self.relative_slo_ms = self._check_slo_ms(relative_slo_ms)
         self.absolute_slo_ms = self._check_slo_ms(absolute_slo_ms)
         self.method_name = method_name
-        self.tracing_metadata = tracing_metadata
+        self.tracing_metadata = tracing_metadata or {
+            "router_name": self.router_name
+        }
 
     def _check_slo_ms(self, slo_value):
         if slo_value is not None:
@@ -115,11 +119,15 @@ class RayServeHandle:
 
         return RayServeHandle(
             self.router_handle,
+            self.router_name,
             self.endpoint_name,
             relative_slo_ms,
             absolute_slo_ms,
             method_name=method_name,
-            tracing_metadata=tracing_metadata
+            tracing_metadata={
+                **tracing_metadata,
+                "router_name": self.router_name,
+            }
             if tracing_metadata is not None
             else self.tracing_metadata,
         )

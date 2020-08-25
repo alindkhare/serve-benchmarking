@@ -22,11 +22,13 @@ class Query:
         request_slo_ms,
         call_method="__call__",
         async_future=None,
+        router_name=None,
     ):
         self.request_id = request_id
         self.request_args = request_args
         self.request_kwargs = request_kwargs
         self.request_context = request_context
+        self.router_name = router_name
 
         self.async_future = async_future
 
@@ -37,8 +39,14 @@ class Query:
         self.call_method = call_method
 
     def on_enqueue(self, endpoint, metadata=None):
-        tracer.add(self.request_id, "router_enqueue")
-        tracer.add_metadata(self.request_id, endpoint=endpoint)
+        tracer.add(
+            self.request_id,
+            "router_enqueue",
+            router_name=metadata.get("router_name", None)
+            if metadata is not None
+            else None,
+        )
+        # tracer.add_metadata(self.request_id, endpoint=endpoint)
         if metadata:
             assert isinstance(metadata, dict)
             tracer.add_metadata(self.request_id, **metadata)
@@ -49,19 +57,28 @@ class Query:
         self.batch_id = batch_id
         self.idx_in_batch = idx_in_batch
 
-        tracer.add(self.request_id, "router_dequeue")
+        tracer.add(
+            self.request_id, "router_dequeue", router_name=self.router_name
+        )
         tracer.add_metadata(
-            self.request_id, backend=backend_name, batch_id=batch_id,
+            self.request_id,
+            backend=backend_name,
+            batch_id=batch_id,
+            router_name=self.router_name,
         )
 
     def on_worker_start(self):
-        tracer.add(self.request_id, "worker_start")
+        tracer.add(
+            self.request_id, "worker_start", router_name=self.router_name
+        )
 
     def on_worker_done(self):
-        tracer.add(self.request_id, "worker_done")
+        tracer.add(self.request_id, "worker_done", router_name=self.router_name)
 
     async def on_complete(self, router):
-        tracer.add(self.request_id, "router_recv_result")
+        tracer.add(
+            self.request_id, "router_recv_result", router_name=self.router_name
+        )
         if self.batch_id is None:
             await router.dequeue_request(self.backend_name, self.backend_worker)
         elif self.idx_in_batch == 0:
@@ -215,6 +232,9 @@ class CentralizedQueues:
             request_slo_ms,
             call_method=request_meta.call_method,
             async_future=asyncio.get_event_loop().create_future(),
+            router_name=request_meta.tracing_metadata.get("router_name", None)
+            if request_meta.tracing_metadata is not None
+            else None,
         )
         return query
 
@@ -395,8 +415,7 @@ class CentralizedQueues:
                 )
             else:
                 real_batch_size = min(len(buffer_queue), max_batch_size)
-                requests = [buffer_queue.pop(0)
-                            for _ in range(real_batch_size)]
+                requests = [buffer_queue.pop(0) for _ in range(real_batch_size)]
 
                 # split requests by method type
                 requests_group = defaultdict(list)
