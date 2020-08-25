@@ -157,7 +157,7 @@ def ray_pin_to_core():
 class InMemoryTracer:
     def __init__(self):
         self.sink = []
-        self.metadata = defaultdict(dict)
+        self.metadata = defaultdict(lambda: defaultdict(dict))
 
     def add(self, query_id, event, router_name=None):
         self.sink.append(
