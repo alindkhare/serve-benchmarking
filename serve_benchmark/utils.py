@@ -172,7 +172,10 @@ class InMemoryTracer:
     def add_metadata(self, query_id, **kwargs):
         if "router_name" in kwargs:
             router_name = kwargs.pop("router_name")
-            router_dictionary = defaultdict(dict)
+            if router_name in self.metadata:
+                router_dictionary = self.metadata[router_name]
+            else:
+                router_dictionary = defaultdict(dict)
             router_dictionary[query_id].update(kwargs)
             self.metadata[router_name].update(router_dictionary)
         else:
