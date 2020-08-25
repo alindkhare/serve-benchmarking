@@ -17,7 +17,10 @@ from serve_benchmark.global_state import GlobalState, start_initial_state
 from serve_benchmark.kv_store_service import SQLiteKVStore
 from serve_benchmark.task_runner import RayServeMixin, TaskRunnerActor
 from serve_benchmark.utils import get_random_letters, expand
-from serve_benchmark.exceptions import RayServeException, batch_annotation_not_found
+from serve_benchmark.exceptions import (
+    RayServeException,
+    batch_annotation_not_found,
+)
 from serve_benchmark.backend_config import BackendConfig
 from serve_benchmark.policy import RoutePolicy
 from serve_benchmark.queues import Query
@@ -113,7 +116,9 @@ def init(
             the backend for a service. (Default: RoutePolicy.Random)
         policy_kwargs: Arguments required to instantiate a queueing policy
     """
-    assert not start_server, "serve_benchmark assume no HTTP started in serve_benchmark"
+    assert (
+        not start_server
+    ), "serve_benchmark assume no HTTP started in serve_benchmark"
 
     global global_state
     # Noop if global_state is no longer None
@@ -288,7 +293,9 @@ def create_backend(
         # arg list for a fn is function itself
         arg_list = [func_or_class]
         # ignore lint on lambda expression
-        def creator(kwrgs): return TaskRunnerActor._remote(**kwrgs)  # noqa: E731
+        def creator(kwrgs):
+            return TaskRunnerActor._remote(**kwrgs)  # noqa: E731
+
     elif inspect.isclass(func_or_class):
         # Python inheritance order is right-to-left. We put RayServeMixin
         # on the left to make sure its methods are not overriden.
@@ -301,7 +308,9 @@ def create_backend(
 
         arg_list = actor_init_args
         # ignore lint on lambda expression
-        def creator(kwargs): return CustomActor._remote(**kwargs)  # noqa: E731
+        def creator(kwargs):
+            return CustomActor._remote(**kwargs)  # noqa: E731
+
     else:
         raise TypeError(
             "Backend must be a function or class, it is {}.".format(
@@ -509,6 +518,7 @@ def get_handle(
 
     return RayServeHandle(
         global_state.init_or_get_router(),
+        global_state.router_name,
         endpoint_name,
         relative_slo_ms,
         absolute_slo_ms,
