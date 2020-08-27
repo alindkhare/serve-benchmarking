@@ -7,7 +7,7 @@ import click
 import torch
 import base64
 
-import serve_benchmark
+from benchmarking import serve_benchmark
 
 serve_benchmark.init(start_server=False)
 
@@ -36,8 +36,7 @@ def main(num_replicas, method):
             config = serve_benchmark.BackendConfig(
                 max_batch_size=1, num_replicas=num_replicas
             )
-            serve_benchmark.create_backend(
-                noop, node_id, backend_config=config)
+            serve_benchmark.create_backend(noop, node_id, backend_config=config)
             serve_benchmark.link(node_id, node_id)
 
     with serve_benchmark.using_router("up"):

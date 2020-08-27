@@ -2,7 +2,7 @@
 Implements echo tensor benchmarking
 """
 
-import serve_benchmark
+from benchmarking import serve_benchmark
 import argparse
 import torch
 import tensorflow as tf
@@ -40,11 +40,11 @@ class Chain:
             with serve_benchmark.using_router(node_id):
                 serve_benchmark.create_endpoint(node_id)
                 config = serve_benchmark.BackendConfig(
-                    max_batch_size=args.max_batch_size,
-                    num_replicas=1
+                    max_batch_size=args.max_batch_size, num_replicas=1
                 )
                 serve_benchmark.create_backend(
-                    noop, node_id, backend_config=config)
+                    noop, node_id, backend_config=config
+                )
                 serve_benchmark.link(node_id, node_id)
                 self.handles.append(serve_benchmark.get_handle(node_id))
 
@@ -55,15 +55,23 @@ class Chain:
 
 
 parser = argparse.ArgumentParser("Bechnmark Configs")
-parser.add_argument("-H", "--height", default=224, type=int,
-                    help="Height of Tensor: [hxwxc]")
-parser.add_argument("-W", "--width", default=224, type=int,
-                    help="Height of Tensor: [hxwxc]")
-parser.add_argument("-C", "--channel", default=3, type=int,
-                    help="channel of Tensor: [hxwxc]")
+parser.add_argument(
+    "-H", "--height", default=224, type=int, help="Height of Tensor: [hxwxc]"
+)
+parser.add_argument(
+    "-W", "--width", default=224, type=int, help="Height of Tensor: [hxwxc]"
+)
+parser.add_argument(
+    "-C", "--channel", default=3, type=int, help="channel of Tensor: [hxwxc]"
+)
 parser.add_argument("-b", "--max-batch-size", default=1, type=int)
-parser.add_argument("-t", "--tensor-type", default="torch",
-                    type=str, choices=["torch", "tf", "np"])
+parser.add_argument(
+    "-t",
+    "--tensor-type",
+    default="torch",
+    type=str,
+    choices=["torch", "tf", "np"],
+)
 parser.add_argument("-r", "--num-requests", type=int, default=2000)
 
 args = parser.parse_args()
@@ -73,8 +81,10 @@ throughput_values = list()
 latency_means = list()
 latency_stds = list()
 
-print(f"Got {args.tensor_type} "
-      f"tensor size: {(args.height, args.width, args.channel)}")
+print(
+    f"Got {args.tensor_type} "
+    f"tensor size: {(args.height, args.width, args.channel)}"
+)
 for plength in pipeline_lengths:
 
     serve_benchmark.init(start_server=False)
@@ -85,7 +95,7 @@ for plength in pipeline_lengths:
     start_time = time.perf_counter()
     ray.wait(
         [chain_pipeline.remote(tensor_data) for _ in range(args.num_requests)],
-        args.num_requests
+        args.num_requests,
     )
     end_time = time.perf_counter()
 
@@ -108,8 +118,10 @@ for plength in pipeline_lengths:
 
     latency_means.append(mean_latency)
     latency_stds.append(std_latency)
-    print(f"Latency calculated: {mean_latency} +- {std_latency} s "
-          f"pipeline: {plength} ")
+    print(
+        f"Latency calculated: {mean_latency} +- {std_latency} s "
+        f"pipeline: {plength} "
+    )
 
     serve_benchmark.shutdown()
     del closed_loop_latencies, tensor_data, chain_pipeline
@@ -118,10 +130,7 @@ for plength in pipeline_lengths:
 
 profile_data = {
     "pipeline_lengths": pipeline_lengths,
-    "latency": {
-        "mean": latency_means,
-        "std": latency_stds,
-    },
+    "latency": {"mean": latency_means, "std": latency_stds,},
     "throughput": throughput_values,
     "tensor_type": args.tensor_type,
 }

@@ -9,7 +9,7 @@ import ray
 import ray.cloudpickle as pickle
 import blist
 
-from serve_benchmark.utils import logger, tracer
+from benchmarking.serve_benchmark.utils import logger, tracer
 
 
 class Query:

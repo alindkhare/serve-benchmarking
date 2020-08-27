@@ -8,29 +8,35 @@ from multiprocessing import cpu_count
 import numpy as np
 
 import ray
-from serve_benchmark.constants import (
+from benchmarking.serve_benchmark.constants import (
     DEFAULT_HTTP_HOST,
     DEFAULT_HTTP_PORT,
     SERVE_MASTER_NAME,
 )
-from serve_benchmark.global_state import GlobalState, start_initial_state
-from serve_benchmark.kv_store_service import SQLiteKVStore
-from serve_benchmark.task_runner import RayServeMixin, TaskRunnerActor
-from serve_benchmark.utils import get_random_letters, expand
-from serve_benchmark.exceptions import (
+from benchmarking.serve_benchmark.global_state import (
+    GlobalState,
+    start_initial_state,
+)
+from benchmarking.serve_benchmark.kv_store_service import SQLiteKVStore
+from benchmarking.serve_benchmark.task_runner import (
+    RayServeMixin,
+    TaskRunnerActor,
+)
+from benchmarking.serve_benchmark.utils import get_random_letters, expand
+from benchmarking.serve_benchmark.exceptions import (
     RayServeException,
     batch_annotation_not_found,
 )
-from serve_benchmark.backend_config import BackendConfig
-from serve_benchmark.policy import RoutePolicy
-from serve_benchmark.queues import Query
-from serve_benchmark.request_params import RequestMetadata
+from benchmarking.serve_benchmark.backend_config import BackendConfig
+from benchmarking.serve_benchmark.policy import RoutePolicy
+from benchmarking.serve_benchmark.queues import Query
+from benchmarking.serve_benchmark.request_params import RequestMetadata
 
 global_state = None
 
 
 def _get_global_state():
-    """Used for internal purpose. Because just import serve_benchmark.global_state
+    """Used for internal purpose. Because just import benchmarking.serve_benchmark.global_state
     will always reference the original None object
     """
     return global_state
@@ -514,7 +520,7 @@ def get_handle(
         )
 
     # Delay import due to it's dependency on global_state
-    from serve_benchmark.handle import RayServeHandle
+    from benchmarking.serve_benchmark.handle import RayServeHandle
 
     return RayServeHandle(
         global_state.init_or_get_router(),

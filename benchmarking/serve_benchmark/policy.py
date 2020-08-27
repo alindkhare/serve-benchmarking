@@ -4,8 +4,8 @@ import itertools
 import numpy as np
 
 import ray
-from serve_benchmark.queues import CentralizedQueues
-from serve_benchmark.utils import logger
+from benchmarking.serve_benchmark.queues import CentralizedQueues
+from benchmarking.serve_benchmark.utils import logger
 
 
 # Note(simon): Important here that we don't assign a core since

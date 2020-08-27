@@ -3,14 +3,14 @@ import asyncio
 import pytest
 import ray
 
-from serve_benchmark.policy import (
+from benchmarking.serve_benchmark.policy import (
     RandomPolicyQueue,
     RandomPolicyQueueActor,
     RoundRobinPolicyQueueActor,
     PowerOfTwoPolicyQueueActor,
     FixedPackingPolicyQueueActor,
 )
-from serve_benchmark.request_params import RequestMetadata
+from benchmarking.serve_benchmark.request_params import RequestMetadata
 
 pytestmark = pytest.mark.asyncio
 

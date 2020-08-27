@@ -10,8 +10,8 @@ from collections import defaultdict
 
 import requests
 from pygments import formatters, highlight, lexers
-from serve_benchmark.context import FakeFlaskRequest, TaskContext
-from serve_benchmark.http_util import build_flask_request
+from benchmarking.serve_benchmark.context import FakeFlaskRequest, TaskContext
+from benchmarking.serve_benchmark.http_util import build_flask_request
 import itertools
 import numpy as np
 import ray

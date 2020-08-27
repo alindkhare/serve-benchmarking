@@ -1,22 +1,22 @@
 from collections import defaultdict
 from contextlib import contextmanager
 import ray
-from serve_benchmark.constants import (
+from benchmarking.serve_benchmark.constants import (
     BOOTSTRAP_KV_STORE_CONN_KEY,
     DEFAULT_HTTP_HOST,
     DEFAULT_HTTP_PORT,
     SERVE_MASTER_NAME,
     ASYNC_CONCURRENCY,
 )
-from serve_benchmark.kv_store_service import (
+from benchmarking.serve_benchmark.kv_store_service import (
     BackendTable,
     RoutingTable,
     TrafficPolicyTable,
 )
 
-from serve_benchmark.policy import RoutePolicy
-from serve_benchmark.http_proxy import HTTPProxyActor
-from serve_benchmark.utils import ray_pin_to_core
+from benchmarking.serve_benchmark.policy import RoutePolicy
+from benchmarking.serve_benchmark.http_proxy import HTTPProxyActor
+from benchmarking.serve_benchmark.utils import ray_pin_to_core
 
 
 def start_initial_state(kv_store_connector):

@@ -1,8 +1,8 @@
-import serve_benchmark
-from serve_benchmark.context import TaskContext
-from serve_benchmark.exceptions import RayServeException
-from serve_benchmark.constants import DEFAULT_HTTP_ADDRESS
-from serve_benchmark.request_params import RequestMetadata
+from benchmarking import serve_benchmark
+from benchmarking.serve_benchmark.context import TaskContext
+from benchmarking.serve_benchmark.exceptions import RayServeException
+from benchmarking.serve_benchmark.constants import DEFAULT_HTTP_ADDRESS
+from benchmarking.serve_benchmark.request_params import RequestMetadata
 
 
 class RayServeHandle:

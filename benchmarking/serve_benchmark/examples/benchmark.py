@@ -8,7 +8,7 @@ import ray
 import click
 import torch
 
-import serve_benchmark
+from benchmarking import serve_benchmark
 
 
 @click.command()

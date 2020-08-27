@@ -4,7 +4,7 @@ import tempfile
 import pytest
 
 import ray
-import serve_benchmark
+from benchmarking import serve_benchmark
 
 
 @pytest.fixture(scope="session")

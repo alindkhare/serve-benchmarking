@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from serve_benchmark.exceptions import RayServeException
+from benchmarking.serve_benchmark.exceptions import RayServeException
 
 
 class TaskContext(IntEnum):

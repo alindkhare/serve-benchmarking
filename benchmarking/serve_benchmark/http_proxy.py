@@ -3,10 +3,10 @@ import socket
 import uvicorn
 
 import ray
-from serve_benchmark.context import TaskContext
-from serve_benchmark.request_params import RequestMetadata
-from serve_benchmark.http_util import Response
-from serve_benchmark.utils import ray_pin_to_core
+from benchmarking.serve_benchmark.context import TaskContext
+from benchmarking.serve_benchmark.request_params import RequestMetadata
+from benchmarking.serve_benchmark.http_util import Response
+from benchmarking.serve_benchmark.utils import ray_pin_to_core
 
 from urllib.parse import parse_qs
 

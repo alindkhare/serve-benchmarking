@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-from serve_benchmark.kv_store_service import (
+from benchmarking.serve_benchmark.kv_store_service import (
     InMemoryKVStore,
     RayInternalKVStore,
     SQLiteKVStore,

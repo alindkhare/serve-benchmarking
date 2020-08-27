@@ -5,8 +5,8 @@ from typing import Union, List
 
 from ray import cloudpickle as pickle
 import ray.experimental.internal_kv as ray_kv
-from serve_benchmark.utils import logger
-from serve_benchmark.constants import NO_ROUTE_KEY
+from benchmarking.serve_benchmark.utils import logger
+from benchmarking.serve_benchmark.constants import NO_ROUTE_KEY
 
 
 class NamespacedKVStore(ABC):

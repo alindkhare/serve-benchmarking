@@ -7,7 +7,7 @@ import click
 import torch
 import base64
 
-import serve_benchmark
+from benchmarking import serve_benchmark
 
 serve_benchmark.init(start_server=False)
 

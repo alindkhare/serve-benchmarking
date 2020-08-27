@@ -2,11 +2,15 @@ import traceback
 import inspect
 
 import ray
-from serve_benchmark import context as serve_context
-from serve_benchmark.context import FakeFlaskRequest
+from benchmarking.serve_benchmark import context as serve_context
+from benchmarking.serve_benchmark.context import FakeFlaskRequest
 from collections import defaultdict
-from serve_benchmark.utils import parse_request_item, ray_pin_to_core, tracer
-from serve_benchmark.exceptions import RayServeException
+from benchmarking.serve_benchmark.utils import (
+    parse_request_item,
+    ray_pin_to_core,
+    tracer,
+)
+from benchmarking.serve_benchmark.exceptions import RayServeException
 
 
 class TaskRunner:
@@ -113,8 +117,7 @@ class RayServeMixin:
 
         method_to_call = self._ray_serve_get_runner_method(request_item)
         args = (
-            args if self._ray_serve_count_num_positional(
-                method_to_call) else []
+            args if self._ray_serve_count_num_positional(method_to_call) else []
         )
         try:
             result = method_to_call(*args, **kwargs)

@@ -2,18 +2,17 @@ import time
 import pytest
 import requests
 
-import serve_benchmark
-from serve_benchmark import BackendConfig
+from benchmarking import serve_benchmark
+from benchmarking.serve_benchmark import BackendConfig
 import ray
-from serve_benchmark.constants import NO_ROUTE_KEY
-from serve_benchmark.exceptions import RayServeException
-from serve_benchmark.handle import RayServeHandle
+from benchmarking.serve_benchmark.constants import NO_ROUTE_KEY
+from benchmarking.serve_benchmark.exceptions import RayServeException
+from benchmarking.serve_benchmark.handle import RayServeHandle
 
 
 def test_e2e(serve_instance):
     serve_benchmark.init()  # so we have access to global state
-    serve_benchmark.create_endpoint(
-        "endpoint", "/api", methods=["GET", "POST"])
+    serve_benchmark.create_endpoint("endpoint", "/api", methods=["GET", "POST"])
     result = serve_benchmark.api._get_global_state().route_table.list_service()
     assert result["/api"] == "endpoint"
 
@@ -57,8 +56,9 @@ def test_route_decorator(serve_instance):
     assert isinstance(hello_world, RayServeHandle)
 
     hello_world.scale(2)
-    assert serve_benchmark.get_backend_config(
-        "hello_world:v0").num_replicas == 2
+    assert (
+        serve_benchmark.get_backend_config("hello_world:v0").num_replicas == 2
+    )
 
     with pytest.raises(
         RayServeException, match="method does not accept batching"
@@ -106,7 +106,8 @@ def test_scaling_replicas(serve_instance):
 
     b_config = BackendConfig(num_replicas=2)
     serve_benchmark.create_backend(
-        Counter, "counter:v1", backend_config=b_config)
+        Counter, "counter:v1", backend_config=b_config
+    )
     serve_benchmark.link("counter", "counter:v1")
 
     counter_result = []
@@ -203,19 +204,16 @@ def test_killing_replicas(serve_instance):
 
     serve_benchmark.create_endpoint("simple", "/simple")
     b_config = BackendConfig(num_replicas=3, num_cpus=2)
-    serve_benchmark.create_backend(
-        Simple, "simple:v1", backend_config=b_config)
+    serve_benchmark.create_backend(Simple, "simple:v1", backend_config=b_config)
     global_state = serve_benchmark.api._get_global_state()
-    old_replica_tag_list = global_state.backend_table.list_replicas(
-        "simple:v1")
+    old_replica_tag_list = global_state.backend_table.list_replicas("simple:v1")
 
     bnew_config = serve_benchmark.get_backend_config("simple:v1")
     # change the config
     bnew_config.num_cpus = 1
     # set the config
     serve_benchmark.set_backend_config("simple:v1", bnew_config)
-    new_replica_tag_list = global_state.backend_table.list_replicas(
-        "simple:v1")
+    new_replica_tag_list = global_state.backend_table.list_replicas("simple:v1")
     global_state.refresh_actor_handle_cache()
     new_all_tag_list = list(global_state.actor_handle_cache.keys())
 
@@ -239,7 +237,8 @@ def test_not_killing_replicas(serve_instance):
     serve_benchmark.create_endpoint("bsimple", "/bsimple")
     b_config = BackendConfig(num_replicas=3, max_batch_size=2)
     serve_benchmark.create_backend(
-        BatchSimple, "bsimple:v1", backend_config=b_config)
+        BatchSimple, "bsimple:v1", backend_config=b_config
+    )
     global_state = serve_benchmark.api._get_global_state()
     old_replica_tag_list = global_state.backend_table.list_replicas(
         "bsimple:v1"

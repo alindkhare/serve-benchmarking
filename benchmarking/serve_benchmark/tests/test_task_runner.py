@@ -3,17 +3,17 @@ import asyncio
 import pytest
 
 import ray
-import serve_benchmark
-import serve_benchmark.context as context
-from serve_benchmark.policy import RoundRobinPolicyQueueActor
-from serve_benchmark.task_runner import (
+from benchmarking import serve_benchmark
+import benchmarking.serve_benchmark.context as context
+from benchmarking.serve_benchmark.policy import RoundRobinPolicyQueueActor
+from benchmarking.serve_benchmark.task_runner import (
     RayServeMixin,
     TaskRunner,
     TaskRunnerActor,
     wrap_to_ray_error,
 )
-from serve_benchmark.request_params import RequestMetadata
-from serve_benchmark.backend_config import BackendConfig
+from benchmarking.serve_benchmark.request_params import RequestMetadata
+from benchmarking.serve_benchmark.backend_config import BackendConfig
 
 pytestmark = pytest.mark.asyncio
 
@@ -47,8 +47,7 @@ async def test_runner_actor(serve_instance):
     q.link.remote(PRODUCER_NAME, CONSUMER_NAME)
 
     for query in [333, 444, 555]:
-        query_param = RequestMetadata(
-            PRODUCER_NAME, context.TaskContext.Python)
+        query_param = RequestMetadata(PRODUCER_NAME, context.TaskContext.Python)
         result = await q.enqueue_request.remote(query_param, i=query)
         assert result == query
 
@@ -78,8 +77,7 @@ async def test_ray_serve_mixin(serve_instance):
     q.link.remote(PRODUCER_NAME, CONSUMER_NAME)
 
     for query in [333, 444, 555]:
-        query_param = RequestMetadata(
-            PRODUCER_NAME, context.TaskContext.Python)
+        query_param = RequestMetadata(PRODUCER_NAME, context.TaskContext.Python)
         result = await q.enqueue_request.remote(query_param, i=query)
         assert result == query + 3
 
@@ -156,10 +154,16 @@ async def test_task_runner_custom_method_batch(serve_instance):
     @serve_benchmark.accept_batch
     class Batcher:
         def a(self, _):
-            return ["a-{}".format(i) for i in range(serve_benchmark.context.batch_size)]
+            return [
+                "a-{}".format(i)
+                for i in range(serve_benchmark.context.batch_size)
+            ]
 
         def b(self, _):
-            return ["b-{}".format(i) for i in range(serve_benchmark.context.batch_size)]
+            return [
+                "b-{}".format(i)
+                for i in range(serve_benchmark.context.batch_size)
+            ]
 
     @ray.remote(num_cpus=1)
     class CustomActor(Batcher, RayServeMixin):

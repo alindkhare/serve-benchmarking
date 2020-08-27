@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 
 import ray
-import serve_benchmark
+from benchmarking import serve_benchmark
 
 
 def test_new_driver(serve_instance):
@@ -11,7 +11,7 @@ def test_new_driver(serve_instance):
 import ray
 ray.init(address="{}")
 
-import serve_benchmark
+from benchmarking import serve_benchmark
 serve_benchmark.init()
 
 @serve_benchmark.route("/driver")

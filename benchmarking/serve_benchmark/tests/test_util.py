@@ -1,6 +1,6 @@
 import json
 
-from serve_benchmark.utils import ServeEncoder
+from benchmarking.serve_benchmark.utils import ServeEncoder
 
 
 def test_bytes_encoder():

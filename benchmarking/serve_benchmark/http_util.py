@@ -100,10 +100,9 @@ class Response:
             self.set_content_type("text-utf8")
         else:
             # Delayed import since utils depends on http_util
-            from serve_benchmark.utils import ServeEncoder
+            from benchmarking.serve_benchmark.utils import ServeEncoder
 
-            self.body = json.dumps(
-                content, cls=ServeEncoder, indent=2).encode()
+            self.body = json.dumps(content, cls=ServeEncoder, indent=2).encode()
             self.set_content_type("json")
 
     def set_content_type(self, content_type):

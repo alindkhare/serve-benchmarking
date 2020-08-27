@@ -1,6 +1,6 @@
-from serve_benchmark.backend_config import BackendConfig
-from serve_benchmark.policy import RoutePolicy
-from serve_benchmark.api import (
+from benchmarking.serve_benchmark.backend_config import BackendConfig
+from benchmarking.serve_benchmark.policy import RoutePolicy
+from benchmarking.serve_benchmark.api import (
     init,
     create_backend,
     create_endpoint,
@@ -33,5 +33,5 @@ __all__ = [
     "get_trace",
     "clear_trace",
     "using_router",
-    "shutdown"
+    "shutdown",
 ]

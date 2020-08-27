@@ -1,5 +1,5 @@
 import time
-from serve_benchmark.constants import DEFAULT_LATENCY_SLO_MS
+from benchmarking.serve_benchmark.constants import DEFAULT_LATENCY_SLO_MS
 import ray.cloudpickle as pickle
 
 
