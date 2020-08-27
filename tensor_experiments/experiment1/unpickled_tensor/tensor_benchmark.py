@@ -75,7 +75,9 @@ class UnpickledTensorExperiment(Experiment):
                 batch_size=batch_size,
                 pipeline_length=pipeline_length,
                 tensor_type=self.config["tensor_type"],
-                tensor_shape=self.config["tensor_shape"],
+                tensor_shape="x".join(
+                    [str(shape) for shape in self.config["tensor_shape"]]
+                ),
                 serving_type=self.config["serving_type"],
                 arrival_process=self.config["arrival_process"],
             )
@@ -132,7 +134,7 @@ class UnpickledTensorExperiment(Experiment):
             )
 
             pprint(df_row)
-            self._df.append(df_row, ignore_index=True)
+            self._df = self._df.append(df_row, ignore_index=True)
 
             # cleanup
             del closed_loop_latencies, chain_pipeline
