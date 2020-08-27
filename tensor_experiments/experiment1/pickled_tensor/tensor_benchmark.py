@@ -57,15 +57,14 @@ class PickledTensorExperiment(Experiment):
         ), "wrong configuration"
         columns = [
             "batch_size",
-            "throughput_qps",
             "pipeline_length",
             "tensor_type",
             "tensor_shape",
             "serving_type",
             "arrival_process",
+            "throughput_qps",
+            "latency_s",
         ]
-        for perc in self.config["latency_percentile"]:
-            columns.append(f"lat_s_{perc}")
         self._df = pd.DataFrame(columns=columns)
 
     def run(self):
@@ -127,18 +126,7 @@ class PickledTensorExperiment(Experiment):
                 closed_loop_latencies.append(latency)
 
             # percentile_values =
-            df_row.update(
-                {
-                    f"lat_s_{percentile}": percentile_value
-                    for percentile, percentile_value in zip(
-                        self.config["latency_percentile"],
-                        np.percentile(
-                            closed_loop_latencies,
-                            self.config["latency_percentile"],
-                        ),
-                    )
-                }
-            )
+            df_row.update(latency_s=closed_loop_latencies)
 
             pprint(df_row)
             self._df = self._df.append(df_row, ignore_index=True)
