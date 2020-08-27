@@ -76,11 +76,12 @@ class UnpickledTensorExperiment(Experiment):
                 serving_type=self.config["serving_type"],
             )
 
+            # initialize serve
+            serve_benchmark.init(start_server=False)
+
             chain_pipeline = Chain(
                 max_batch_size=batch_size, pipeline_length=pipeline_length
             )
-            # initialize serve
-            serve_benchmark.init(start_server=False)
 
             # warmup
             ray.wait(
