@@ -18,7 +18,7 @@ class Chain:
         self.plength = pipeline_length
         self.handles = list()
 
-        for index in range(plength):
+        for index in range(self.plength):
             node_id = f"service-{index}"
             with serve_benchmark.using_router(node_id):
                 serve_benchmark.create_endpoint(node_id)
