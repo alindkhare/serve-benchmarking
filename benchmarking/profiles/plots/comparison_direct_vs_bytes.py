@@ -5,6 +5,7 @@ import argparse
 import json
 import pandas as pd
 import seaborn as sns
+from collections import defaultdict
 
 sns.set_style("white")
 sns.set_context(
@@ -45,6 +46,7 @@ def plot_df(df, current_platform):
             nrows=len(pipeline_lengths), figsize=(3.0, 4.0), sharex=True,
         )
         # for mechanism, axes in zip(mechanisms, axis_plots):
+        mechanism_latency = defaultdict(list)
         for pipeline_length, ax in zip(pipeline_lengths, axis_plots):
             for mechanism, color in zip(mechanisms, colors):
                 pipeline_df = plot_df.loc[
@@ -53,6 +55,11 @@ def plot_df(df, current_platform):
                 pipeline_mech_df = pipeline_df.loc[
                     pipeline_df["mechanism"] == mechanism
                 ]
+                # for only batch size on
+                mask = pipeline_mech_df["max_batch_size"] == 1
+                latency = pipeline_mech_df.loc[mask, "latency_s(mean)"].iloc[0]
+                mechanism_latency[mechanism].append(latency)
+
                 # ax.set_ylim(0, 0.12)
                 # ax.set_yscale("symlog")
                 ax.plot(
@@ -74,6 +81,24 @@ def plot_df(df, current_platform):
         fname = f"performance_plots_{tensor_type}.pdf"
         fpath = os.path.join(utils.RESULT_DIR, platform, tensor_type, fname)
         plt.savefig(fpath, bbox_inches="tight")
+        _, lat_x = plt.subplots(
+            nrows=1, ncols=1, figsize=(3.0, 3.0), sharex=True,
+        )
+        diff_y = [
+            v1 - v2
+            for v1, v2 in zip(
+                mechanism_latency["unpickled"], mechanism_latency["pickled"]
+            )
+        ]
+        lat_x.plot(pipeline_lengths, diff_y)
+        lat_x.set_ylabel("Latency in seconds")
+        lat_x.set_xlabel("Chain pipeline Max BS:1 lengths")
+        lat_x.set_title("Unpickled - Pickled difference latencies")
+        fpath = os.path.join(
+            utils.RESULT_DIR, platform, tensor_type, "Latency_dif.pdf"
+        )
+        plt.savefig(fpath, bbox_inches="tight")
+        print(mechanism_latency)
 
         # plt.plot(pipeline_df)
 

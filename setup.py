@@ -4,7 +4,7 @@ from os import path
 here = path.abspath(path.dirname(__file__))
 
 setup(
-    name="serve_benchmark",
+    name="benchmarking",
     version="0.0.1",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     python_requires=">=3.6, <3.8",

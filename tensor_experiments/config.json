@@ -1,0 +1,28 @@
+{
+    "max_batch_sizes": [
+        1,
+        2,
+        4,
+        8
+    ],
+    "pipeline_lengths": [
+        1,
+        2,
+        4,
+        8
+    ],
+    "tensor_type": "torch",
+    "tensor_shape": [
+        224,
+        224,
+        3
+    ],
+    "serving_type": "vanilla",
+    "num_requests": 2000,
+    "latency_percentile": [
+        50,
+        95,
+        99
+    ],
+    "arrival_process": "closed_loop"
+}
