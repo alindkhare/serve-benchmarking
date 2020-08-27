@@ -125,10 +125,10 @@ class PickledTensorExperiment(Experiment):
                 latency = end_time - start_time
                 closed_loop_latencies.append(latency)
 
+            pprint(df_row)
             # percentile_values =
             df_row.update(latency_s=closed_loop_latencies)
 
-            pprint(df_row)
             self._df = self._df.append(df_row, ignore_index=True)
 
             # cleanup
