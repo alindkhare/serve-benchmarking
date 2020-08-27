@@ -7,6 +7,7 @@ import time
 import numpy as np
 import click
 import pickle
+from pprint import pprint
 
 
 @serve_benchmark.accept_batch
@@ -134,6 +135,7 @@ class PickledTensorExperiment(Experiment):
                 }
             )
 
+            pprint(df_row)
             self._df.append(df_row, ignore_index=True)
 
             # cleanup
