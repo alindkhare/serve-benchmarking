@@ -7,7 +7,7 @@ class Experiment:
         self.name = name
         self.config = None
         with open(config_path, "r") as fp:
-            self.config = json.read(fp)
+            self.config = json.load(fp)
 
     @abstractmethod
     def run(self):
