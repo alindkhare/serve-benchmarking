@@ -8,6 +8,7 @@ import numpy as np
 import click
 import pickle
 from pprint import pprint
+from itertools import product
 
 
 @serve_benchmark.accept_batch
@@ -69,7 +70,7 @@ class PickledTensorExperiment(Experiment):
     def run(self):
 
         tensor_data = construct_tensor(self.config)
-        for batch_size, pipeline_length in zip(
+        for batch_size, pipeline_length in product(
             self.config["max_batch_sizes"], self.config["pipeline_lengths"]
         ):
             df_row = dict(
