@@ -62,6 +62,7 @@ class PickledTensorExperiment(Experiment):
             "tensor_type",
             "tensor_shape",
             "serving_type",
+            "arrival_process",
         ]
         for perc in self.config["latency_percentile"]:
             columns.append(f"lat_s_{perc}")
@@ -79,6 +80,7 @@ class PickledTensorExperiment(Experiment):
                 tensor_type=self.config["tensor_type"],
                 tensor_shape=self.config["tensor_shape"],
                 serving_type=self.config["serving_type"],
+                arrival_process=self.config["arrival_process"],
             )
 
             # initialize serve
