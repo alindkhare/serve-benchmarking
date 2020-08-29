@@ -237,6 +237,8 @@ class RayServeMixin:
                 kwargs, metadata["kwarg_keys"], metadata["batch_size"]
             )
             result = call_method([FakeFlaskRequest()], **kwargs_list)
+            if metadata["batch_size"] == 1:
+                result = result[0]
         else:
             result = call_method([], **kwargs)
 
