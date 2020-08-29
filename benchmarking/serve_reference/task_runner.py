@@ -238,7 +238,7 @@ class RayServeMixin:
             )
             result = call_method([FakeFlaskRequest()], **kwargs_list)
         else:
-            result = call_method(**kwargs)
+            result = call_method([], **kwargs)
 
         # re-assign to default values
         serve_context.web = False
