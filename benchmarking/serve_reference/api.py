@@ -85,7 +85,7 @@ def init(
     http_host=DEFAULT_HTTP_HOST,
     http_port=DEFAULT_HTTP_PORT,
     ray_init_kwargs={
-        "object_store_memory": int(1e8),
+        "object_store_memory": int(1e9),
         "num_cpus": max(cpu_count(), 8),
         "_internal_config": json.dumps(
             {
