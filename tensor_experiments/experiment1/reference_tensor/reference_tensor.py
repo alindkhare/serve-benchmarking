@@ -138,7 +138,7 @@ class ReferencedTensorExperiment(Experiment):
             for _ in range(self.config["num_requests"]):
                 start_time = time.perf_counter()
                 ready, _ = ray.wait([chain_pipeline.remote(tensor_data)], 1)
-                ray.wait([ready], 1)
+                ray.wait(ready, 1)
                 end_time = time.perf_counter()
                 latency = end_time - start_time
                 closed_loop_latencies.append(latency)
