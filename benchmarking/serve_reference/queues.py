@@ -258,7 +258,7 @@ class CentralizedQueues:
         # replica task submission
         result = await query.async_future
 
-        asyncio.get_event_loop().create_task(query.on_complete(self))
+        # asyncio.get_event_loop().create_task(query.on_complete(self))
 
         return result
 
