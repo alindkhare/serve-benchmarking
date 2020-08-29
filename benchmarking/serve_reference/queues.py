@@ -419,7 +419,8 @@ class CentralizedQueues:
                 
                 """
                 ray_future = worker._ray_serve_call_ref._remote(
-                    {
+                    args=[],
+                    kwargs={
                         "metadata": {
                             "kwarg_keys": list(request.request_kwargs.keys()),
                             "batch_size": None,
@@ -456,7 +457,8 @@ class CentralizedQueues:
             unwrapped_kwargs = to_batchable_kwargs(requests)
 
             ray_futures = worker._ray_serve_call_ref._remote(
-                {
+                args=[],
+                kwargs={
                     "metadata": {
                         "kwarg_keys": list(requests[0].request_kwargs.keys()),
                         "batch_size": real_batch_size,
