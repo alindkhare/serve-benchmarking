@@ -443,40 +443,42 @@ class CentralizedQueues:
                 # request.on_assigned(
                 #     backend_name, worker, batch_id=None, idx_in_batch=None
                 # )
-        else:
+            else:
 
-            """
-            Major change
-                
-                
-                
-                
-            """
-            real_batch_size = min(len(buffer_queue), max_batch_size)
-            requests = [buffer_queue.pop(0) for _ in range(real_batch_size)]
-            unwrapped_kwargs = to_batchable_kwargs(requests)
+                """
+                Major change
+                    
+                    
+                    
+                    
+                """
+                real_batch_size = min(len(buffer_queue), max_batch_size)
+                requests = [buffer_queue.pop(0) for _ in range(real_batch_size)]
+                unwrapped_kwargs = to_batchable_kwargs(requests)
 
-            ray_futures = worker._ray_serve_call_ref._remote(
-                args=[],
-                kwargs={
-                    "metadata": {
-                        "kwarg_keys": list(requests[0].request_kwargs.keys()),
-                        "batch_size": real_batch_size,
-                        "call_method": "__call__",
+                ray_futures = worker._ray_serve_call_ref._remote(
+                    args=[],
+                    kwargs={
+                        "metadata": {
+                            "kwarg_keys": list(
+                                requests[0].request_kwargs.keys()
+                            ),
+                            "batch_size": real_batch_size,
+                            "call_method": "__call__",
+                        },
+                        **unwrapped_kwargs,
                     },
-                    **unwrapped_kwargs,
-                },
-                num_return_vals=real_batch_size,
-            )
-
-            """
-            Change here
-            assign these ray futures as values async futures
-            """
-            for batch_idx in range(real_batch_size):
-                requests[batch_idx].async_future.set_result(
-                    ray_futures[batch_idx]
+                    num_return_vals=real_batch_size,
                 )
+
+                """
+                Change here
+                assign these ray futures as values async futures
+                """
+                for batch_idx in range(real_batch_size):
+                    requests[batch_idx].async_future.set_result(
+                        ray_futures[batch_idx]
+                    )
 
             # split requests by method type
             # requests_group = defaultdict(list)
