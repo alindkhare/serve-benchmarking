@@ -471,6 +471,9 @@ class CentralizedQueues:
                     num_return_vals=real_batch_size,
                 )
 
+                if real_batch_size == 1:
+                    ray_futures = [ray_futures]
+
                 """
                 Change here
                 assign these ray futures as values async futures
