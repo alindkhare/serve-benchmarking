@@ -14,7 +14,7 @@ import pandas as pd
 import json
 import time
 import ray
-from serve_benchmark.utils import (
+from benchmarking.utils import (
     generate_fixed_arrival_process,
     get_latency,
     ROOT_DIR,
