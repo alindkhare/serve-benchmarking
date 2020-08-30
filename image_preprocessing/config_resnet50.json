@@ -4,7 +4,7 @@
         {
             "mean_qps": 100,
             "cv": 0,
-            "num_requests": 2000
+            "num_requests": 1000
         }
     ],
     "vertex_configs": [
