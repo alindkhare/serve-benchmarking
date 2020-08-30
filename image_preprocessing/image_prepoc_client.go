@@ -54,7 +54,7 @@ func main() {
 	start := time.Now()
 	for i := 0; i < len(arrival_curve); i++ {
 		// time.Sleep(12195 * time.Microsecond)
-		values := map[string]string{"image": imgBase64Str}
+		values := map[string]string{"data": imgBase64Str}
 		time_ms, err_time := strconv.ParseFloat(arrival_curve[i], 64)
 		if err_time != nil {
 			fmt.Println(err)

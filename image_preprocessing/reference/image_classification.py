@@ -222,7 +222,10 @@ class ReferencedTensorExperiment(Experiment):
                     ROOT_DIR, self.config["client_path"]
                 )
 
-                arrival_curve = generate_fixed_arrival_process(**arrival_config)
+                arrival_curve = generate_fixed_arrival_process(
+                    **arrival_config
+                ).tolist()
+                arrival_curve_str = [str(x) for x in arrival_curve]
                 ls_output = subprocess.Popen(
                     [
                         "go",
@@ -230,7 +233,7 @@ class ReferencedTensorExperiment(Experiment):
                         go_client_path,
                         image_path,
                         route,
-                        *arrival_curve,
+                        *arrival_curve_str,
                     ]
                 )
 
@@ -241,7 +244,7 @@ class ReferencedTensorExperiment(Experiment):
                 self._df = self._df.append(df_row, ignore_index=True)
 
                 # cleanup
-                del latency_s, pipeline
+                del latency_s, pipeline, arrival_curve, arrival_curve_str
                 serve_reference.shutdown()
 
     def save(self, filepath):
