@@ -18,17 +18,6 @@
                 "max_batch_size": 1,
                 "num_gpus": 1
             }
-        },
-        {
-            "prepoc": {
-                "num_replicas": 1,
-                "max_batch_size": 1
-            },
-            "model": {
-                "num_replicas": 1,
-                "max_batch_size": 4,
-                "num_gpus": 1
-            }
         }
     ],
     "client_path": "image_preprocessing/image_prepoc_client.go",
