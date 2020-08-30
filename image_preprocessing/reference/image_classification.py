@@ -209,7 +209,7 @@ class ReferencedTensorExperiment(Experiment):
 
                 http_actor = HTTPProxyActor.remote(
                     host="127.0.0.1",
-                    port="8000",
+                    port=8000,
                     serving_backend=self.config["serving_type"],
                     filename=filename_query,
                 )
