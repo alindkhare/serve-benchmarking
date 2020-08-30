@@ -66,7 +66,7 @@ func main() {
 		// values := map[string]string{"data": imgBase64Str}
 		go MakeRequest("http://127.0.0.1:8000"+endpoint, values, ch)
 	}
-	for i := 0; i <= 1024; i++ {
+	for i := 0; i < len(arrival_curve); i++ {
 		fmt.Println(<-ch)
 	}
 	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
