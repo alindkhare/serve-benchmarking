@@ -1,0 +1,34 @@
+{
+    "model_type": "resnet50",
+    "arrival_config": [
+        {
+            "mean_qps": 100,
+            "cv": 0,
+            "num_requests": 2000
+        }
+    ],
+    "vertex_configs": [
+        {
+            "prepoc": {
+                "num_replicas": 1,
+                "max_batch_size": 1
+            },
+            "model": {
+                "num_replicas": 1,
+                "max_batch_size": 1
+            }
+        },
+        {
+            "prepoc": {
+                "num_replicas": 1,
+                "max_batch_size": 1
+            },
+            "model": {
+                "num_replicas": 1,
+                "max_batch_size": 4
+            }
+        }
+    ],
+    "client_path": "image_preprocessing/image_prepoc_client.go",
+    "image_file_path": "image_preprocessing/elephant.jpg"
+}

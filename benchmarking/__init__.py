@@ -1,5 +1,6 @@
 from benchmarking import serve_benchmark
 from benchmarking.experiment import Experiment, Plotter
+from benchmarking.server import HTTPProxyActor
 
 SERVE_IMPLEMENTATIONS = ["vanilla"]
 
@@ -9,4 +10,10 @@ def get_name(module):
         return "vanilla"
 
 
-__all__ = ["serve_benchmark", "get_serve", "Experiment", "Plotter"]
+__all__ = [
+    "serve_benchmark",
+    "get_serve",
+    "Experiment",
+    "Plotter",
+    "HTTPProxyActor",
+]
