@@ -23,6 +23,7 @@ import os
 import subprocess
 import click
 from typing import Any
+from torch.autograd import Variable
 
 
 class Transform:
@@ -64,7 +65,7 @@ class PredictModelPytorch:
     @serve_reference.accept_batch
     def __call__(self, _, data: list) -> list:
         data = torch.stack(data)
-        data = torch.Variable(data)
+        data = Variable(data)
         if self.is_cuda:
             data = data.cuda()
         outputs = self.model(data)
