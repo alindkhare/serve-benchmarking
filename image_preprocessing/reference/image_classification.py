@@ -37,7 +37,7 @@ class Transform:
         self.transform = transform
 
     @serve_reference.accept_batch
-    def __call__(self, data: list) -> list:
+    def __call__(self, _, data: list) -> list:
         data_list = list()
         for img in data:
             data = Image.open(io.BytesIO(base64.b64decode(img)))
@@ -62,7 +62,7 @@ class PredictModelPytorch:
             self.model = self.model.cuda()
 
     @serve_reference.accept_batch
-    def __call__(self, data: list) -> list:
+    def __call__(self, _, data: list) -> list:
         data = torch.stack(data)
         data = torch.Variable(data)
         if self.is_cuda:
