@@ -204,6 +204,8 @@ class ReferencedTensorExperiment(Experiment):
                 )
                 df_row.update(throughput_qps=throughput_qps)
 
+                pprint(df_row)
+
                 http_actor = HTTPProxyActor.remote(
                     host="127.0.0.1",
                     port="8000",
