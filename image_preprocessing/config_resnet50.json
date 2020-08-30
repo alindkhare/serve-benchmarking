@@ -15,7 +15,8 @@
             },
             "model": {
                 "num_replicas": 1,
-                "max_batch_size": 1
+                "max_batch_size": 1,
+                "num_gpus": 1
             }
         },
         {
@@ -25,7 +26,8 @@
             },
             "model": {
                 "num_replicas": 1,
-                "max_batch_size": 4
+                "max_batch_size": 4,
+                "num_gpus": 1
             }
         }
     ],
