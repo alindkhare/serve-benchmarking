@@ -183,7 +183,7 @@ class ReferencedTensorExperiment(Experiment):
             for arrival_config in self.config["arrival_config"]:
 
                 serve_reference.init(start_server=False)
-                filename_query = "arrival_trace.json"
+                filename_query = "arrival_trace.jsonl"
                 route = "/prepoc"
 
                 pipeline = ImagePrepocPipeline(
@@ -236,6 +236,7 @@ class ReferencedTensorExperiment(Experiment):
                         *arrival_curve_str,
                     ]
                 )
+                ls_output.communicate()
 
                 latency_s = get_latency(filename_query)
                 os.remove(filename_query)

@@ -53,7 +53,7 @@ class BytesEncoder(json.JSONEncoder):
 
 def get_latency(filename):
     latency = list()
-    with jsonlines.open("input.jsonl") as reader:
+    with jsonlines.open(filename) as reader:
         for obj in reader:
             latency.append((obj["end"] - obj["start"]))
     return latency
