@@ -19,11 +19,10 @@ class Experiment:
 
 
 class Plotter:
-    def __init__(self, filename, plot_config_path):
-        self.filename = filename
+    def __init__(self, plot_config_path):
         self.config = None
         with open(plot_config_path, "r") as fp:
-            self.config = json.read(fp)
+            self.config = json.load(fp)
 
     @abstractmethod
     def plot(self, experiment_file):
