@@ -15,7 +15,7 @@ def gamma(mean, cv, size):
         return np.random.gamma(1.0 / cv, cv * mean, size=size)
 
 
-def generate_fixed_arrival_process(mean_qps, cv, num_queries):
+def generate_fixed_arrival_process(mean_qps, cv, num_requests):
     """
     mean_qps : float
         Mean qps
@@ -27,7 +27,7 @@ def generate_fixed_arrival_process(mean_qps, cv, num_queries):
     #                            "fixed_{mean_qps}_{cv}_{dur}_{ts:%y%m%d_%H%M%S}.deltas".format(
     #                                mean_qps=mean_qps, cv=cv, dur=duration, ts=datetime.now()))
     inter_request_delay_ms = 1.0 / float(mean_qps) * 1000.0
-    num_deltas = num_queries - 1
+    num_deltas = num_requests - 1
     if cv == 0:
         deltas = np.ones(num_deltas) * inter_request_delay_ms
     else:
