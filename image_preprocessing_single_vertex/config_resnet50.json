@@ -10,7 +10,7 @@
     "vertex_configs": [
         {
             "one_vertex": {
-                "num_replicas": 2,
+                "num_replicas": 1,
                 "max_batch_size": 8,
                 "num_gpus": 1
             }
