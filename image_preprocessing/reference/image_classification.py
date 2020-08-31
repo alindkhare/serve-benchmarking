@@ -174,7 +174,8 @@ class ReferencedTensorExperiment(Experiment):
                     result_wait, num_returns=len(result_wait), timeout=0
                 )
                 cnt += len(s_ready)
-                if len(s_unready) == 0:
+                if cnt == num_requests:
+                    assert len(s_unready) == 0, "Wrong throughput calculation"
                     break
                 else:
                     current_result = s_unready
