@@ -144,9 +144,11 @@ class ReferencedTensorExperiment(Experiment):
         tensor_data = base64.b64encode(open(image_path, "rb").read())
 
         # warmup
-        ray.wait(
+        complete, _ = ray.wait(
             [chain_pipeline.remote(tensor_data) for _ in range(200)], 200,
         )
+
+        ray.wait(complete, 200)
 
         start_time = time.perf_counter()
         fut = [
