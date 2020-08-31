@@ -146,10 +146,12 @@ class ReferencedTensorExperiment(Experiment):
         print("warmming up")
         # warmup
         ray.wait(
-            [chain_pipeline.remote(tensor_data) for _ in range(200)], 200,
+            [chain_pipeline.remote(tensor_data) for _ in range(100)], 100,
         )
         print("Warmup done")
         print("Onto Throughput calculation")
+
+        num_requests = 100
 
         start_time = time.perf_counter()
         ray.wait(
