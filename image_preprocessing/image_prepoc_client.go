@@ -78,6 +78,8 @@ func main() {
 	}
 	for i := 0; i < len(arrival_curve); i++ {
 		fmt.Println(<-ch)
+		s := fmt.Sprintf("query complete %d", i)
+		fmt.Println(s)
 	}
 	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
 }
