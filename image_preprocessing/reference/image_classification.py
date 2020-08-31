@@ -171,6 +171,7 @@ class ReferencedTensorExperiment(Experiment):
                     result_wait, num_returns=len(result_wait), timeout=0
                 )
                 if len(s_unready) == 0:
+                    print(f"Finally got all results {len(ray.get(s_ready))}")
                     break
                 else:
                     current_result = s_unready
