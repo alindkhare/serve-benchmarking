@@ -145,26 +145,30 @@ class ReferencedTensorExperiment(Experiment):
 
         print("warmming up")
         # warmup
-        ray.wait(
+        ready, _ = ray.wait(
             [chain_pipeline.remote(tensor_data) for _ in range(100)], 100,
         )
+        print(f"Warmup {len(ready)}")
         print("Warmup done")
         print("Onto Throughput calculation")
+        del ready
 
         num_requests = 100
 
         start_time = time.perf_counter()
-        ray.wait(
+        ready, _ = ray.wait(
             [
                 chain_pipeline.remote(data=tensor_data)
                 for _ in range(num_requests)
             ],
             num_requests,
         )
+        print(f"Throughput {len(ready)}")
 
         end_time = time.perf_counter()
         duration = end_time - start_time
         qps = num_requests / duration
+        del ready
         return qps
 
     def run(self):
@@ -215,6 +219,7 @@ class ReferencedTensorExperiment(Experiment):
                     **arrival_config
                 ).tolist()
                 arrival_curve_str = [str(x) for x in arrival_curve]
+                print(f"arrival_curve lenght: {len(arrival_curve_str)}")
                 ls_output = subprocess.Popen(
                     [
                         "go",
