@@ -1,0 +1,21 @@
+{
+    "model_type": "resnet50",
+    "arrival_config": [
+        {
+            "mean_qps": 100,
+            "cv": 0,
+            "num_requests": 1000
+        }
+    ],
+    "vertex_configs": [
+        {
+            "one_vertex": {
+                "num_replicas": 2,
+                "max_batch_size": 8,
+                "num_gpus": 1
+            }
+        }
+    ],
+    "client_path": "image_preprocessing_single_vertex/image_prepoc_client.go",
+    "image_file_path": "image_preprocessing_single_vertex/elephant.jpg"
+}

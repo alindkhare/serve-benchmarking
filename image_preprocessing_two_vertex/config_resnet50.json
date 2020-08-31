@@ -20,6 +20,6 @@
             }
         }
     ],
-    "client_path": "image_preprocessing/image_prepoc_client.go",
-    "image_file_path": "image_preprocessing/elephant.jpg"
+    "client_path": "image_preprocessing_two_vertex/image_prepoc_client.go",
+    "image_file_path": "image_preprocessing_two_vertex/elephant.jpg"
 }

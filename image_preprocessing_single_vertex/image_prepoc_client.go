@@ -26,9 +26,17 @@ func MakeRequest(url string, values map[string]string, ch chan<- string) {
 	// current_time_str := strconv.FormatFloat(current_time, 'E', -1, 64)
 	// values["absolute_slo_ms"] = current_time_str
 	jsonValue, _ := json.Marshal(values)
-	resp, _ := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	resp, err_res := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	if err_res != nil {
+		fmt.Println(err_res)
+		os.Exit(1)
+	}
 	secs := time.Since(start).Seconds()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err_body := ioutil.ReadAll(resp.Body)
+	if err_body != nil {
+		fmt.Println(err_body)
+		os.Exit(1)
+	}
 	ch <- fmt.Sprintf("%.2f elapsed with response length: %s %s", secs, body, url)
 }
 func main() {
