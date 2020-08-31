@@ -61,6 +61,7 @@ func main() {
 
 	time.Sleep(10 * time.Millisecond)
 	fmt.Println("Start firing to the client")
+	fmt.Println(len(arrival_curve))
 	start := time.Now()
 	for i := 0; i < len(arrival_curve); i++ {
 		// time.Sleep(12195 * time.Microsecond)
@@ -76,6 +77,7 @@ func main() {
 		// values := map[string]string{"data": imgBase64Str}
 		go MakeRequest(client, "http://127.0.0.1:8000"+endpoint, values, ch)
 	}
+	fmt.Println("Fired all the queries now waiting for them")
 	for i := 0; i < len(arrival_curve); i++ {
 		fmt.Println(<-ch)
 		s := fmt.Sprintf("query complete %d", i)
