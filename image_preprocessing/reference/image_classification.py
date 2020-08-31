@@ -157,6 +157,7 @@ class ReferencedTensorExperiment(Experiment):
         current_router = fut
         current_result = list()
         all_ready = False
+        cnt = 0
         while True:
             if not all_ready:
                 ready, unready = ray.wait(
@@ -170,8 +171,8 @@ class ReferencedTensorExperiment(Experiment):
                 s_ready, s_unready = ray.wait(
                     result_wait, num_returns=len(result_wait), timeout=0
                 )
+                cnt += len(s_ready)
                 if len(s_unready) == 0:
-                    print(f"Finally got all results {len(ray.get(s_ready))}")
                     break
                 else:
                     current_result = s_unready
@@ -184,6 +185,7 @@ class ReferencedTensorExperiment(Experiment):
         end_time = time.perf_counter()
         duration = end_time - start_time
         qps = num_requests / duration
+        print(f"total queries: {cnt}")
         return qps
 
     def run(self):
