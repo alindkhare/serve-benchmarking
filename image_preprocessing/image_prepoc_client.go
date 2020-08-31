@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -17,7 +18,7 @@ func unixMilli(t time.Time) float64 {
 	return float64(t.Round(time.Millisecond).UnixNano() / (int64(time.Millisecond) / int64(time.Nanosecond)))
 }
 
-func MakeRequest(url string, values map[string]string, ch chan<- string) {
+func MakeRequest(client *http.Client, url string, values map[string]string, ch chan<- string) {
 	// values := map[string]byte{"data": username}
 
 	start := time.Now()
@@ -26,12 +27,13 @@ func MakeRequest(url string, values map[string]string, ch chan<- string) {
 	// current_time_str := strconv.FormatFloat(current_time, 'E', -1, 64)
 	// values["absolute_slo_ms"] = current_time_str
 	jsonValue, _ := json.Marshal(values)
-	resp, _ := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
+	resp, _ := client.Post(url, "application/json", bytes.NewBuffer(jsonValue))
 	secs := time.Since(start).Seconds()
 	body, _ := ioutil.ReadAll(resp.Body)
 	ch <- fmt.Sprintf("%.2f elapsed with response length: %s %s", secs, body, url)
 }
 func main() {
+	runtime.GOMAXPROCS(5)
 	ch := make(chan string)
 	image_file_path := os.Args[1]
 	endpoint := os.Args[2]
@@ -41,7 +43,15 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
 	defer imgFile.Close()
+
+	tr := &http.Transport{
+		MaxIdleConnsPerHost: 30,
+		MaxConnsPerHost:     31,
+	}
+	client := &http.Client{Transport: tr}
+
 	fInfo, _ := imgFile.Stat()
 	var size int64 = fInfo.Size()
 	buf := make([]byte, size)
@@ -64,7 +74,7 @@ func main() {
 		//fmt.Println("done sleep")
 		//time.Sleep(time.Duration(time_ms) * time.Microsecond)
 		// values := map[string]string{"data": imgBase64Str}
-		go MakeRequest("http://127.0.0.1:8000"+endpoint, values, ch)
+		go MakeRequest(client, "http://127.0.0.1:8000"+endpoint, values, ch)
 	}
 	for i := 0; i < len(arrival_curve); i++ {
 		fmt.Println(<-ch)
