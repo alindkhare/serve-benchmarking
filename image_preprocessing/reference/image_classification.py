@@ -158,11 +158,13 @@ class ReferencedTensorExperiment(Experiment):
         current_result = list()
         all_ready = False
         cnt = 0
+        cnt_all_ready = 0
         while True:
             if not all_ready:
                 ready, unready = ray.wait(
                     current_router, num_returns=len(current_router), timeout=0
                 )
+                cnt_all_ready += len(ready)
             else:
                 ready, unready = [], []
 
@@ -180,6 +182,7 @@ class ReferencedTensorExperiment(Experiment):
                 current_router = unready
             else:
                 all_ready = True
+                print(f"All fired queries ready: {cnt_all_ready}")
                 # current_router = s_unready
 
         end_time = time.perf_counter()
