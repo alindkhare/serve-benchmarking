@@ -143,6 +143,7 @@ class ReferencedTensorExperiment(Experiment):
     def _throughput_calculation(self, chain_pipeline, image_path, num_requests):
         tensor_data = base64.b64encode(open(image_path, "rb").read())
 
+        print("warmming up")
         # warmup
         ray.wait(
             [chain_pipeline.remote(tensor_data) for _ in range(200)], 200,
