@@ -166,7 +166,7 @@ class ReferencedTensorExperiment(Experiment):
                 ready, unready = [], []
 
             if all_ready or len(ready) > 0:
-                result_wait = ready + current_result
+                result_wait = ray.get(ready) + current_result
                 s_ready, s_unready = ray.wait(
                     result_wait, num_returns=len(result_wait), timeout=0
                 )
