@@ -41,9 +41,9 @@ class PredictModelPytorch:
             self.model = self.model.cuda()
 
     @serve_benchmark.accept_batch
-    def __call__(self, imgs: list) -> list:
+    def __call__(self, _, data: list) -> list:
         data_list = list()
-        for img in imgs:
+        for img in data:
             data = Image.open(io.BytesIO(base64.b64decode(img)))
             if data.mode != "RGB":
                 data = data.convert("RGB")
