@@ -183,13 +183,16 @@ class ReferencedTensorExperiment(Experiment):
                 current_router = unready
             else:
                 all_ready = True
-                print(f"All fired queries ready: {cnt_all_ready}")
+                assert (
+                    cnt_all_ready == num_requests
+                ), "Wrong throughput calculation"
+                # print(f"All fired queries ready: {cnt_all_ready}")
                 # current_router = s_unready
 
         end_time = time.perf_counter()
         duration = end_time - start_time
         qps = num_requests / duration
-        print(f"total queries: {cnt}")
+        # print(f"total queries: {cnt}")
         return qps
 
     def run(self):
