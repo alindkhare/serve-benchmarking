@@ -148,7 +148,7 @@ class ReferencedTensorExperiment(Experiment):
             [chain_pipeline.remote(tensor_data) for _ in range(200)], 200,
         )
 
-        ray.wait(complete, 200)
+        ray.wait(ray.get(complete), 200)
 
         start_time = time.perf_counter()
         fut = [
