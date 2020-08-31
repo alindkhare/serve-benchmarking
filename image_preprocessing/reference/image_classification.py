@@ -154,26 +154,31 @@ class ReferencedTensorExperiment(Experiment):
         fut = [
             chain_pipeline.remote(data=tensor_data) for _ in range(num_requests)
         ]
-        current = fut
+        current_router = fut
+        current_result = list()
         all_ready = False
         while True:
             if not all_ready:
                 ready, unready = ray.wait(
-                    current, num_returns=len(current), timeout=0
+                    current_router, num_returns=len(current_router), timeout=0
                 )
             else:
-                ready = current
-            if len(ready) > 0:
+                ready, unready = [], []
+
+            if all_ready or len(ready) > 0:
+                result_wait = ready + current_result
                 s_ready, s_unready = ray.wait(
-                    ready, num_returns=len(ready), timeout=0
+                    result_wait, num_returns=len(result_wait), timeout=0
                 )
                 if len(s_unready) == 0:
                     break
+                else:
+                    current_result = s_unready
             if len(unready) > 0:
-                current = unready
+                current_router = unready
             else:
                 all_ready = True
-                current = s_unready
+                # current_router = s_unready
 
         end_time = time.perf_counter()
         duration = end_time - start_time
