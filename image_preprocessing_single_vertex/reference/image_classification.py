@@ -214,46 +214,46 @@ class ReferencedTensorExperiment(Experiment):
 
                 pprint(df_row)
 
-                # http_actor = HTTPProxyActor.remote(
-                #     host="127.0.0.1",
-                #     port=8000,
-                #     serving_backend=self.config["serving_type"],
-                #     filename=filename_query,
-                # )
-                # ray.get(
-                #     http_actor.register_route.remote(
-                #         route, pipeline.chain_handle
-                #     )
-                # )
-                # go_client_path = os.path.join(
-                #     ROOT_DIR, self.config["client_path"]
-                # )
+                http_actor = HTTPProxyActor.remote(
+                    host="127.0.0.1",
+                    port=8000,
+                    serving_backend=self.config["serving_type"],
+                    filename=filename_query,
+                )
+                ray.get(
+                    http_actor.register_route.remote(
+                        route, pipeline.chain_handle
+                    )
+                )
+                go_client_path = os.path.join(
+                    ROOT_DIR, self.config["client_path"]
+                )
 
-                # arrival_curve = generate_fixed_arrival_process(
-                #     **arrival_config
-                # ).tolist()
-                # arrival_curve_str = [str(x) for x in arrival_curve]
-                # ls_output = subprocess.Popen(
-                #     [
-                #         "go",
-                #         "run",
-                #         go_client_path,
-                #         image_path,
-                #         route,
-                #         *arrival_curve_str,
-                #     ]
-                # )
-                # ls_output.communicate()
+                arrival_curve = generate_fixed_arrival_process(
+                    **arrival_config
+                ).tolist()
+                arrival_curve_str = [str(x) for x in arrival_curve]
+                ls_output = subprocess.Popen(
+                    [
+                        "go",
+                        "run",
+                        go_client_path,
+                        image_path,
+                        route,
+                        *arrival_curve_str,
+                    ]
+                )
+                ls_output.communicate()
 
-                # latency_s = get_latency(filename_query)
-                # os.remove(filename_query)
+                latency_s = get_latency(filename_query)
+                os.remove(filename_query)
 
-                # df_row.update(latency_s=latency_s)
-                # self._df = self._df.append(df_row, ignore_index=True)
+                df_row.update(latency_s=latency_s)
+                self._df = self._df.append(df_row, ignore_index=True)
 
-                # # cleanup
-                # del latency_s, pipeline, arrival_curve, arrival_curve_str
-                # serve_reference.shutdown()
+                # cleanup
+                del latency_s, pipeline, arrival_curve, arrival_curve_str
+                serve_reference.shutdown()
 
     def save(self, filepath):
         self._df.to_csv(os.path.join(self._model_dir, filepath))
