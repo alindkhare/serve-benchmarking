@@ -24,6 +24,7 @@ import subprocess
 import click
 from typing import Any
 from torch.autograd import Variable
+from tqdm import tqdm
 
 
 class Transform:
@@ -200,7 +201,7 @@ class ReferencedTensorExperiment(Experiment):
 
             # closed loop latency calculation
             closed_loop_latencies = list()
-            for _ in range(self.config["num_requests"]):
+            for _ in tqdm(range(self.config["num_requests"])):
                 start_time = time.perf_counter()
                 ready, _ = ray.wait([pipeline.remote(tensor_data)], 1)
                 end_time = time.perf_counter()
