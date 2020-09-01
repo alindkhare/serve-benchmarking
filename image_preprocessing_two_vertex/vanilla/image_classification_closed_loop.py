@@ -140,8 +140,9 @@ class ReferencedTensorExperiment(Experiment):
         if not os.path.exists(self._model_dir):
             os.makedirs(self._model_dir)
 
-    def _throughput_calculation(self, chain_pipeline, image_path, num_requests):
-        tensor_data = base64.b64encode(open(image_path, "rb").read())
+    def _throughput_calculation(
+        self, chain_pipeline, tensor_data, num_requests
+    ):
 
         print("warmming up")
         # warmup
