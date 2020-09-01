@@ -1,0 +1,19 @@
+{
+    "model_type": "resnet50",
+    "num_requests": 1000,
+    "arrival_process": "closed_loop",
+    "vertex_configs": [
+        {
+            "prepoc": {
+                "num_replicas": 1,
+                "max_batch_size": 1
+            },
+            "model": {
+                "num_replicas": 1,
+                "max_batch_size": 1,
+                "num_gpus": 1
+            }
+        }
+    ],
+    "image_file_path": "image_preprocessing_two_vertex/elephant.jpg"
+}

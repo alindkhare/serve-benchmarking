@@ -184,14 +184,14 @@ class ReferencedTensorExperiment(Experiment):
             df_row = dict(
                 vertex_config=vertex_config_name,
                 serving_type=self.config["serving_type"],
-                arrival_process="closed loop",
+                arrival_process=self.config["arrival_process"],
             )
 
             image_path = os.path.join(ROOT_DIR, self.config["image_file_path"])
             tensor_data = base64.b64encode(open(image_path, "rb").read())
 
             throughput_qps = self._throughput_calculation(
-                pipeline, tensor_data, 1000
+                pipeline, tensor_data, self.config["num_requests"]
             )
             df_row.update(throughput_qps=throughput_qps)
 
@@ -199,7 +199,7 @@ class ReferencedTensorExperiment(Experiment):
 
             # closed loop latency calculation
             closed_loop_latencies = list()
-            for _ in range(1000):
+            for _ in range(self.config["num_requests"]):
                 start_time = time.perf_counter()
                 ready, _ = ray.wait([pipeline.remote(tensor_data)], 1)
                 end_time = time.perf_counter()
@@ -219,8 +219,12 @@ class ReferencedTensorExperiment(Experiment):
 
 
 @click.command()
-@click.option("--config-path", type=str, default="../config_resnet50.json")
-@click.option("--save-path", type=str, default="image_prepoc_vanilla.csv")
+@click.option(
+    "--config-path", type=str, default="../resnet50_config_closed_loop.json"
+)
+@click.option(
+    "--save-path", type=str, default="image_prepoc_vanilla_closed_loop.csv"
+)
 def main(config_path, save_path):
     experiment = ReferencedTensorExperiment(
         name="ref_prepoc", config_path=config_path

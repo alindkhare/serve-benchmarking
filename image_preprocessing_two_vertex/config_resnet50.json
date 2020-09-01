@@ -10,12 +10,12 @@
     "vertex_configs": [
         {
             "prepoc": {
-                "num_replicas": 1,
-                "max_batch_size": 1
+                "num_replicas": 2,
+                "max_batch_size": 8
             },
             "model": {
-                "num_replicas": 1,
-                "max_batch_size": 1,
+                "num_replicas": 2,
+                "max_batch_size": 8,
                 "num_gpus": 1
             }
         }
