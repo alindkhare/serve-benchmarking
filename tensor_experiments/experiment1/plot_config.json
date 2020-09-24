@@ -1,0 +1,12 @@
+{
+    "profiles": {
+        "vanilla": "tensor_experiments/experiment1/unpickled_tensor/unpickled_tensor_stats.csv",
+        "pickled": "tensor_experiments/experiment1/pickled_tensor/pickled_tensor_stats.csv",
+        "reference": "tensor_experiments/experiment1/reference_tensor/reference_tensor_stats.csv"
+    },
+    "comparison_keys": [
+        "throughput_qps",
+        "latency_s"
+    ],
+    "one_plot_per": "batch_size"
+}
