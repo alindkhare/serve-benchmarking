@@ -2,6 +2,8 @@ import git
 import os
 import json
 import jsonlines
+import time
+import ray
 
 ROOT_DIR = git.Repo(".", search_parent_directories=True).working_tree_dir
 
@@ -57,3 +59,33 @@ def get_latency(filename):
         for obj in reader:
             latency.append((obj["end"] - obj["start"]))
     return latency
+
+
+def throughput_calculation(serve_handle, data_kwarg, num_requests):
+    start_time = time.perf_counter()
+    fut = [serve_handle.remote(**data_kwarg) for _ in range(num_requests)]
+    current = fut
+    all_ready = False
+    while True:
+        if not all_ready:
+            ready, unready = ray.wait(
+                current, num_returns=len(current), timeout=0
+            )
+        else:
+            ready = current
+        if len(ready) > 0:
+            s_ready, s_unready = ray.wait(
+                ready, num_returns=len(ready), timeout=0
+            )
+            if len(s_unready) == 0:
+                break
+        if len(unready) > 0:
+            current = unready
+        else:
+            all_ready = True
+            current = s_unready
+
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    qps = num_requests / duration
+    return qps

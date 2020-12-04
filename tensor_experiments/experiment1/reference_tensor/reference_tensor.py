@@ -170,4 +170,3 @@ def main(config_path, save_path):
 
 if __name__ == "__main__":
     main()
-
