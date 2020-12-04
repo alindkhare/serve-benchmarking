@@ -17,6 +17,7 @@ import torch
 import torchvision.transforms as transforms
 from torchvision import models
 import io
+from typing import Any
 
 
 class PredictModelPytorch:
