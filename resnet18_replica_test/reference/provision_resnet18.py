@@ -97,11 +97,11 @@ def main():
         ready_refs, _ = ray.wait(
             [serve_handle.remote(data=img) for _ in range(200)], 200
         )
-        complete_oids, _ = ray.wait(ready_refs, num_returns=200)
+        complete_oids, _ = ray.wait(ray.get(ready_refs), num_returns=200)
         del ready_refs
         del complete_oids
 
-        qps = throughput_calculation_1(serve_handle, {"data": img}, 2000)
+        qps = throughput_calculation(serve_handle, {"data": img}, 2000)
         print(
             f"[Resnet18] Batch Size: 8 Replica: {num_replica} "
             f"Throughput: {qps} QPS"
