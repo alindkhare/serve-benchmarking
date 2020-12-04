@@ -102,3 +102,14 @@ def throughput_calculation(serve_handle, data_kwarg, num_requests):
     duration = end_time - start_time
     qps = num_requests / duration
     return qps
+
+
+def throughput_calculation_1(serve_handle, data_kwarg, num_requests):
+    start_time = time.perf_counter()
+    fut = [serve_handle.remote(**data_kwarg) for _ in range(num_requests)]
+    ready_refs, _ = ray.wait(fut, num_returns=num_requests)
+    ray.wait(ready_refs, num_returns=num_requests)
+    end_time = time.perf_counter()
+    duration = end_time - start_time
+    qps = num_requests / duration
+    return qps
