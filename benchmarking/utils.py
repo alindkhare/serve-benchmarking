@@ -64,26 +64,39 @@ def get_latency(filename):
 def throughput_calculation(serve_handle, data_kwarg, num_requests):
     start_time = time.perf_counter()
     fut = [serve_handle.remote(**data_kwarg) for _ in range(num_requests)]
-    current = fut
     all_ready = False
+    current_router = fut
+    current_result = list()
+    all_ready = False
+    cnt = 0
+    cnt_all_ready = 0
     while True:
         if not all_ready:
             ready, unready = ray.wait(
-                current, num_returns=len(current), timeout=0
+                current_router, num_returns=len(current_router), timeout=0
             )
+            cnt_all_ready += len(ready)
         else:
-            ready = current
-        if len(ready) > 0:
+            ready, unready = [], []
+
+        if all_ready or len(ready) > 0:
+            result_wait = ray.get(ready) + current_result
             s_ready, s_unready = ray.wait(
-                ready, num_returns=len(ready), timeout=0
+                result_wait, num_returns=len(result_wait), timeout=0
             )
-            if len(s_unready) == 0:
+            cnt += len(s_ready)
+            if cnt == num_requests:
+                assert len(s_unready) == 0, "Wrong throughput calculation"
                 break
+            else:
+                current_result = s_unready
         if len(unready) > 0:
-            current = unready
+            current_router = unready
         else:
             all_ready = True
-            current = s_unready
+            assert cnt_all_ready == num_requests, "Wrong throughput calculation"
+            # print(f"All fired queries ready: {cnt_all_ready}")
+            # current_router = s_unready
 
     end_time = time.perf_counter()
     duration = end_time - start_time
