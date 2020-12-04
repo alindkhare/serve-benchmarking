@@ -56,7 +56,20 @@ class PredictModelPytorch:
 
 
 def main():
+
     TAG = "Resnet18"
+    min_img_size = 224
+    transform = transforms.Compose(
+        [
+            transforms.Resize(min_img_size),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225],
+            ),
+        ]
+    )
+
     for num_replica in range(1, 9):
         # initialize serve
         serve_reference.init(start_server=False)
@@ -70,6 +83,7 @@ def main():
             serve_reference.create_backend(
                 PredictModelPytorch,
                 TAG,
+                transform,
                 "resnet18",
                 True,
                 backend_config=config,
