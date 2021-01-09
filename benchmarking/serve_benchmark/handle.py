@@ -72,7 +72,7 @@ class RayServeHandle:
             )
 
         return self.router_handle.enqueue_request.remote(
-            self._make_metadata(), **kwargs
+            self._make_metadata(), request_kwargs=kwargs
         )
 
     def _make_metadata(self):

@@ -239,7 +239,7 @@ class CentralizedQueues:
         return query
 
     async def enqueue_request(
-        self, request_meta, *request_args, **request_kwargs
+        self, request_meta, request_args=list(), request_kwargs=dict()
     ):
         service = request_meta.service
         logger.debug("Received a request for service {}".format(service))
