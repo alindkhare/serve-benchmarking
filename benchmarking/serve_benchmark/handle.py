@@ -72,7 +72,7 @@ class RayServeHandle:
                 "handle.remote must be invoked with keyword arguments."
             )
         for kwarg in kwargs:
-            if not isinstance(kwargs[kwarg], ray.ObjectRef):
+            if not isinstance(kwargs[kwarg], ray.ObjectID):
                 kwargs[kwarg] = ray.put(kwargs[kwarg])
 
         return self.router_handle.enqueue_request.remote(
