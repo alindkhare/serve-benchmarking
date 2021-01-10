@@ -87,12 +87,12 @@ def init(
     ray_init_kwargs={
         "object_store_memory": int(1e9),
         "num_cpus": max(cpu_count(), 8),
-        "_internal_config": json.dumps(
-            {
-                "max_direct_call_object_size": 10 * 1024 * 1024,  # 10Mb
-                "max_grpc_message_size": 100 * 1024 * 1024,  # 100Mb
-            }
-        ),
+        # "_internal_config": json.dumps(
+        #     {
+        #         "max_direct_call_object_size": 10 * 1024 * 1024,  # 10Mb
+        #         "max_grpc_message_size": 100 * 1024 * 1024,  # 100Mb
+        #     }
+        # ),
     },
     queueing_policy=RoutePolicy.Random,
     policy_kwargs={},
