@@ -3,6 +3,7 @@ from benchmarking.serve_benchmark.context import TaskContext
 from benchmarking.serve_benchmark.exceptions import RayServeException
 from benchmarking.serve_benchmark.constants import DEFAULT_HTTP_ADDRESS
 from benchmarking.serve_benchmark.request_params import RequestMetadata
+import ray
 
 
 class RayServeHandle:
@@ -70,6 +71,9 @@ class RayServeHandle:
             raise RayServeException(
                 "handle.remote must be invoked with keyword arguments."
             )
+        for kwarg in kwargs:
+            if not isinstance(kwargs[kwarg], ray.ObjectRef):
+                kwargs[kwarg] = ray.put(kwargs[kwarg])
 
         return self.router_handle.enqueue_request.remote(
             self._make_metadata(), request_kwargs=kwargs
