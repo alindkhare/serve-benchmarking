@@ -152,7 +152,7 @@ class GlobalState:
         return self.actor_handle_cache["http_proxy"]
 
     def init_or_get_router(
-        self, queueing_policy=RoutePolicy.Random, policy_kwargs={}
+        self, queueing_policy=RoutePolicy.New, policy_kwargs={}
     ):
         assert self.router_name != "default", (
             "Default router detected, did you forgot to use "

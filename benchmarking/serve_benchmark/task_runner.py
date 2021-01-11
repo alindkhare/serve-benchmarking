@@ -211,13 +211,13 @@ class RayServeMixin:
         # check if work_item is a list or not
         # if it is list: then batching supported
         if not isinstance(request, list):
-            request.on_worker_start()
+            # request.on_worker_start()
             result = self.invoke_single(request)
-            request.on_worker_done()
+            # request.on_worker_done()
         else:
-            [r.on_worker_start() for r in request]
+            # [r.on_worker_start() for r in request]
             result = self.invoke_batch(request)
-            [r.on_worker_done() for r in request]
+            # [r.on_worker_done() for r in request]
 
         # re-assign to default values
         serve_context.web = False

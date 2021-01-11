@@ -5,11 +5,17 @@ import numpy as np
 
 import ray
 from benchmarking.serve_benchmark.queues import CentralizedQueues
+from benchmarking.serve_benchmark.queues1 import NewQueues
 from benchmarking.serve_benchmark.utils import logger
 
 
 # Note(simon): Important here that we don't assign a core since
 # we create a router for each endpoint
+@ray.remote(num_cpus=0)
+class NewActor(NewQueues):
+    pass
+
+
 @ray.remote(num_cpus=0)
 class RandomPolicyQueueActor(CentralizedQueues):
     pass
@@ -170,6 +176,7 @@ class RoutePolicy(Enum):
     in `serve_benchmark.init` method through name provided here.
     """
 
+    New = NewActor
     Random = RandomPolicyQueueActor
     RoundRobin = RoundRobinPolicyQueueActor
     PowerOfTwo = PowerOfTwoPolicyQueueActor

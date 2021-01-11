@@ -30,6 +30,7 @@ from benchmarking.serve_benchmark.exceptions import (
 from benchmarking.serve_benchmark.backend_config import BackendConfig
 from benchmarking.serve_benchmark.policy import RoutePolicy
 from benchmarking.serve_benchmark.queues import Query
+from benchmarking.serve_benchmark.queues1 import NewQuery
 from benchmarking.serve_benchmark.request_params import RequestMetadata
 
 global_state = None
@@ -94,7 +95,7 @@ def init(
         #     }
         # ),
     },
-    queueing_policy=RoutePolicy.Random,
+    queueing_policy=RoutePolicy.New,
     policy_kwargs={},
 ):
     """Initialize a serve_benchmark cluster.
@@ -145,7 +146,7 @@ def init(
 
     # Register serialization context once
     ray.register_custom_serializer(
-        Query, Query.ray_serialize, Query.ray_deserialize
+        NewQuery, NewQuery.ray_serialize, NewQuery.ray_deserialize
     )
     ray.register_custom_serializer(
         RequestMetadata,
