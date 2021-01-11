@@ -3,6 +3,7 @@ import asyncio
 import uvloop
 import pickle
 import copy
+from typing import DefaultDict, List
 
 
 def _make_future_unwrapper(
