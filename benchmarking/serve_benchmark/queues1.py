@@ -91,6 +91,9 @@ class NewQueues:
     async def link(self, service, backend):
         pass
 
+    async def set_traffic(self, service, traffic_dict):
+        await self.flush()
+
     async def flush(self):
         """In the default case, flush calls ._flush.
 

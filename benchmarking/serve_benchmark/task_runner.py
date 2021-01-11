@@ -80,7 +80,7 @@ class RayServeMixin:
         assert self._ray_serve_setup_completed
 
         self._ray_serve_router_handle.dequeue_request.remote(
-            self._ray_serve_dequeue_requester_name, self._ray_serve_self_handle
+            self._ray_serve_self_handle
         )
 
     def _ray_serve_get_runner_method(self, request_item):
