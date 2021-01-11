@@ -102,7 +102,7 @@ class NewQueues:
         """
         while len(self._service_queues) and len(self._worker_queues):
             worker = self._worker_queues.pop()
-            max_batch_size = self.backend_info["max_batch_size"]
+            max_batch_size = self.config_dict["max_batch_size"]
             if max_batch_size is None:  # No batching
                 request = self._service_queues.pop()
                 future = worker._ray_serve_call.remote(request).as_future()
