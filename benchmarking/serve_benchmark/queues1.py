@@ -53,6 +53,7 @@ class NewQuery:
         clone = copy.copy(self).__dict__
         clone.pop("async_future")
         clone.pop("backend_worker")
+        clone.pop("call_method")
         return pickle.dumps(clone, protocol=4)
 
     @staticmethod
