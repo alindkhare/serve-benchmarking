@@ -37,13 +37,15 @@ class NewQuery:
         self.backend_worker = None
         self.call_method = "__call__"
         self.request_context = serve_context.TaskContext.Python
+        self.first = None
 
-    def on_assigned(self, worker):
+    def on_assigned(self, worker, first=True):
         self.backend_worker = worker
+        self.first = first
 
     def done(self, router):
         assert self.backend_worker is not None, "error in router"
-        if self.batch_id is None or self.idx_in_batch == 0:
+        if self.first:
             router.dequeue_request(self.backend_worker)
 
     def ray_serialize(self):
@@ -57,6 +59,7 @@ class NewQuery:
         clone.pop("backend_worker")
         clone.pop("call_method")
         clone.pop("request_context")
+        clone.pop("first")
         return pickle.dumps(clone, protocol=4)
 
     @staticmethod
@@ -127,5 +130,8 @@ class NewQueues:
                     host_future=future,
                 )
 
-                [q.on_assigned(worker) for i, q in enumerate(requests)]
+                [
+                    q.on_assigned(worker, first=(i == 0))
+                    for i, q in enumerate(requests)
+                ]
                 future.add_done_callback(complete_all_future)
