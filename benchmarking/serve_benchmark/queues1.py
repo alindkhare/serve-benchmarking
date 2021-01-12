@@ -4,6 +4,7 @@ import uvloop
 import pickle
 import copy
 from typing import DefaultDict, List
+from benchmarking.serve_benchmark import context as serve_context
 
 
 def _make_future_unwrapper(
@@ -35,6 +36,7 @@ class NewQuery:
         self.async_future = async_future
         self.backend_worker = None
         self.call_method = "__call__"
+        self.request_context = serve_context.TaskContext.Python
 
     def on_assigned(self, worker):
         self.backend_worker = worker
@@ -54,6 +56,7 @@ class NewQuery:
         clone.pop("async_future")
         clone.pop("backend_worker")
         clone.pop("call_method")
+        clone.pop("request_context")
         return pickle.dumps(clone, protocol=4)
 
     @staticmethod
