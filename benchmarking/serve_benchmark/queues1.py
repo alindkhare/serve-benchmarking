@@ -43,10 +43,10 @@ class NewQuery:
         self.backend_worker = worker
         self.first = first
 
-    def done(self, router):
+    async def done(self, router):
         assert self.backend_worker is not None, "error in router"
         if self.first:
-            router.dequeue_request(self.backend_worker)
+            await router.dequeue_request(self.backend_worker)
 
     def ray_serialize(self):
         # NOTE: this method is needed because Query need to be serialized and
@@ -86,7 +86,7 @@ class NewQueues:
         self._service_queues.append(query)
         await self.flush()
         result = await query.async_future
-        query.done(self)
+        asyncio.get_event_loop().create_task(query.done(self))
         return result
 
     async def dequeue_request(self, replica_handle):
