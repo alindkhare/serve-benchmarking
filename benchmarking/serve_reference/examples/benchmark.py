@@ -9,24 +9,29 @@ import click
 import torch
 
 from benchmarking import serve_reference
+from benchmarking.utils import throughput_calculation, throughput_calculation_1
 
 
 @click.command()
 @click.option("--batch-size", type=int, default=None)
 @click.option("--num-warmups", type=int, default=200)
-@click.option("--num-queries", type=int, default=5000)
+@click.option("--num-queries", type=int, default=500)
 @click.option(
     "--return-type", type=click.Choice(["string", "torch"]), default="string"
 )
 def main(batch_size, num_warmups, num_queries, return_type):
     serve_reference.init()
 
-    def noop(_, *args, **kwargs):
+    # def noop(_, *args, **kwargs):
+    def noop(_, val):
         bs = serve_reference.context.batch_size
         assert (
             bs == batch_size
         ), f"worker received {bs} which is not what expected"
         result = ""
+        time.sleep(.01)
+
+        return val
 
         if return_type == "torch":
             result = torch.zeros((3, 224, 224))
@@ -36,6 +41,10 @@ def main(batch_size, num_warmups, num_queries, return_type):
         else:
             return [result] * bs
 
+    def noop2(_, val):
+        time.sleep(.01)
+        return val
+
     if batch_size:
         noop = serve_reference.accept_batch(noop)
 
@@ -44,9 +53,17 @@ def main(batch_size, num_warmups, num_queries, return_type):
         config = serve_reference.BackendConfig(max_batch_size=batch_size)
         serve_reference.create_backend(noop, "noop", backend_config=config)
         serve_reference.link("noop", "noop")
-        handle = serve_reference.get_handle("noop")
+        handle = serve_reference.get_handle("noop").options()
+
+    with serve_reference.using_router("noop2"):
+        serve_reference.create_endpoint("noop2", "/noop2")
+        config = serve_reference.BackendConfig(max_batch_size=batch_size)
+        serve_reference.create_backend(noop2, "noop2", backend_config=config)
+        serve_reference.link("noop2", "noop2")
+        handle2 = serve_reference.get_handle("noop2").options()
 
     latency = []
+    # handle.next_handle = handle2
     for i in tqdm(range(num_warmups + num_queries)):
         if i == num_warmups:
             serve_reference.clear_trace()
@@ -54,13 +71,15 @@ def main(batch_size, num_warmups, num_queries, return_type):
         start = time.perf_counter()
 
         if not batch_size:
-            ray.get(
+            ray.get(ray.get(
                 # This is how to pass a higher level metadata to the tracing
                 # context
-                handle.options(
-                    tracing_metadata={"demo": "pipeline-id"}
-                ).remote()
-            )
+                # handle.remote(val=1)
+                handle.remote(val=handle2.remote(val=1))
+                # handle.options(
+                #     tracing_metadata={"demo": "pipeline-id"}
+                # ).remote()
+            ))
         else:
             ray.get(handle.enqueue_batch(val=[1] * batch_size))
             # ray.get([handle.remote() for _ in range(batch_size)])
@@ -75,10 +94,12 @@ def main(batch_size, num_warmups, num_queries, return_type):
     print("Latency for single noop backend (ms)")
     print(series.describe(percentiles=[0.5, 0.9, 0.95, 0.99]))
 
-    _, trace_file = tempfile.mkstemp(suffix=".json")
-    with open(trace_file, "w") as f:
-        json.dump(serve_reference.get_trace(), f)
-    print(f"trace file written to {trace_file}")
+    qps = throughput_calculation_1(handle, {'val': [1]}, num_queries)
+    print(f"Throughput: {qps}")
+    # _, trace_file = tempfile.mkstemp(suffix=".json")
+    # with open(trace_file, "w") as f:
+    #     json.dump(serve_reference.get_trace(), f)
+    # print(f"trace file written to {trace_file}")
 
 
 if __name__ == "__main__":

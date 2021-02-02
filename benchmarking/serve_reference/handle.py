@@ -49,6 +49,7 @@ class RayServeHandle:
         self.tracing_metadata = tracing_metadata or {
             "router_name": self.router_name
         }
+        self.next_handle = None
 
     def _check_slo_ms(self, slo_value):
         if slo_value is not None:
@@ -71,9 +72,14 @@ class RayServeHandle:
                 "handle.remote must be invoked with keyword arguments."
             )
 
-        return self.router_handle.enqueue_request.remote(
-            self._make_metadata(), **kwargs
-        )
+        if self.next_handle:
+            return self.router_handle.enqueue_request.remote(
+                self._make_metadata(), self.next_handle._make_metadata(), **kwargs
+            )
+        else:
+            return self.router_handle.enqueue_request.remote(
+                self._make_metadata(), None, **kwargs
+            )
 
     def _make_metadata(self):
         method_name = self.method_name

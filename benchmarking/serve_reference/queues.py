@@ -8,6 +8,7 @@ from typing import DefaultDict, List
 import ray
 import ray.cloudpickle as pickle
 import blist
+import time
 
 from benchmarking.serve_reference.utils import (
     logger,
@@ -242,9 +243,23 @@ class CentralizedQueues:
         )
         return query
 
-    async def enqueue_request(
+    async def enqueue_request2(
         self, request_meta, *request_args, **request_kwargs
     ):
+        print("Start")
+        # start = time.time()
+        future = await self.enqueue_request2(request_meta, request_args, request_kwargs)
+        # print(future)
+        # print(time.time() - start)
+        # start = time.time()
+        future2 = await self.enqueue_request2(request_meta, request_args, request_kwargs)
+        return future
+
+
+    async def enqueue_request(
+        self, request_meta, next_meta, *request_args, **request_kwargs
+    ):
+        # print(self.worker_queues)
         service = request_meta.service
         logger.debug("Received a request for service {}".format(service))
 
@@ -254,11 +269,21 @@ class CentralizedQueues:
         await self.service_queues[service].put(query)
         await self.flush()
 
+
         # Note: a future change can be to directly return the ObjectID from
         # replica task submission
         result = await query.async_future
 
         # asyncio.get_event_loop().create_task(query.on_complete(self))
+        if next_meta:
+            service = next_meta.service
+            query = self._make_query(next_meta, request_args, {'val': result})
+            query.on_enqueue(service, metadata=next_meta.tracing_metadata)
+
+            await self.service_queues[service].put(query)
+
+            await self.flush()
+            result = await query.async_future
 
         return result
 
@@ -406,7 +431,6 @@ class CentralizedQueues:
     async def _assign_query_to_worker(
         self, backend_name, buffer_queue, worker_queue, max_batch_size=None
     ):
-
         while len(buffer_queue) and worker_queue.qsize():
             worker = await worker_queue.get()
             if max_batch_size is None:  # No batching
