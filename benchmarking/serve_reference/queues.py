@@ -269,7 +269,6 @@ class CentralizedQueues:
         await self.service_queues[service].put(query)
         await self.flush()
 
-
         # Note: a future change can be to directly return the ObjectID from
         # replica task submission
         result = await query.async_future
@@ -277,7 +276,7 @@ class CentralizedQueues:
         # asyncio.get_event_loop().create_task(query.on_complete(self))
         if next_meta:
             service = next_meta.service
-            query = self._make_query(next_meta, request_args, {'val': result})
+            query = self._make_query(next_meta, request_args, {'data': result})
             query.on_enqueue(service, metadata=next_meta.tracing_metadata)
 
             await self.service_queues[service].put(query)
