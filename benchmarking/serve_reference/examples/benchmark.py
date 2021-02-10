@@ -53,7 +53,7 @@ def main(batch_size, num_warmups, num_queries, return_type):
 
     def noop2(_, data):
         # time.sleep(.01)
-        for _ in range(100000):
+        for _ in range(10000):
             data += 1
         return data
 
@@ -67,7 +67,8 @@ def main(batch_size, num_warmups, num_queries, return_type):
         serve_reference.link("noop", "noop")
         handle = serve_reference.get_handle("noop").options()
 
-    # with serve_reference.using_router("noop2"):
+    # Uncomment next line to use serve_reference
+    with serve_reference.using_router("noop2"):
         serve_reference.create_endpoint("noop2", "/noop2")
         config = serve_reference.BackendConfig(max_batch_size=batch_size)
         serve_reference.create_backend(noop2, "noop2", backend_config=config)
@@ -75,8 +76,9 @@ def main(batch_size, num_warmups, num_queries, return_type):
         handle2 = serve_reference.get_handle("noop2").options()
 
     latency = []
-    # handle = ChainHandle([handle, handle2])
-    handle.next_handle = handle2
+    # Switch commenting of next two lines to use serve_reference
+    handle = ChainHandle([handle, handle2])
+    # handle.next_handle = handle2
     for i in tqdm(range(num_warmups + num_queries)):
         if i == num_warmups:
             serve_reference.clear_trace()
@@ -84,15 +86,18 @@ def main(batch_size, num_warmups, num_queries, return_type):
         start = time.perf_counter()
 
         if not batch_size:
-            ray.get(#ray.get(
+            future = handle.remote(data=1)
+            future = ray.get(future)
+            ray.get(future)
+            # ray.get(ray.get(
                 # This is how to pass a higher level metadata to the tracing
                 # context
-                handle.remote(data=1)
+                # handle.remote(data=1)
                 # handle.remote(val=handle2.remote(val=1))
                 # handle.options(
                 #     tracing_metadata={"demo": "pipeline-id"}
                 # ).remote()
-            )#)
+            # ))
         else:
             ray.get(handle.enqueue_batch(data=[1] * batch_size))
             # ray.get([handle.remote() for _ in range(batch_size)])
@@ -107,12 +112,12 @@ def main(batch_size, num_warmups, num_queries, return_type):
     print("Latency for single noop backend (ms)")
     print(series.describe(percentiles=[0.5, 0.9, 0.95, 0.99]))
 
-    #qps = throughput_calculation_1(handle, {'data': [1]}, num_queries)
-    #print(f"Throughput: {qps}")
-    # _, trace_file = tempfile.mkstemp(suffix=".json")
-    # with open(trace_file, "w") as f:
-    #     json.dump(serve_reference.get_trace(), f)
-    # print(f"trace file written to {trace_file}")
+    qps = throughput_calculation_1(handle, {'data': 1}, num_queries)
+    print(f"Throughput: {qps}")
+    _, trace_file = tempfile.mkstemp(suffix=".json")
+    with open(trace_file, "w") as f:
+        json.dump(serve_reference.get_trace(), f)
+    print(f"trace file written to {trace_file}")
 
 
 if __name__ == "__main__":
