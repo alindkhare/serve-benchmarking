@@ -228,6 +228,8 @@ class RayServeMixin:
 
     def _ray_serve_call_ref(self, metadata, **kwargs):
         # TODO(alind): Remove call_method feature
+        tracer.add(metadata["request_id"], "worker_start", router_name=metadata["router_name"])
+        #tracer.add(None, "worker_start", None)
         call_method = getattr(self, metadata["call_method"])
         serve_context.batch_size = metadata["batch_size"]
         serve_context.web = False
@@ -246,6 +248,8 @@ class RayServeMixin:
         serve_context.web = False
         serve_context.batch_size = None
         self._ray_serve_fetch()
+        #tracer.add(None, "worker_done", None)
+        tracer.add(metadata["request_id"], "worker_done", router_name=metadata["router_name"])
         return result
 
     def _ray_serve_get_trace(self):

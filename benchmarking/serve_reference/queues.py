@@ -264,6 +264,8 @@ class CentralizedQueues:
         logger.debug("Received a request for service {}".format(service))
 
         query = self._make_query(request_meta, request_args, request_kwargs)
+        #request_meta.tracing_metadata["request_id"] = query.request_id
+        #request_meta.tracing_metadata["router_name"] = query.router_name
         query.on_enqueue(service, metadata=request_meta.tracing_metadata)
 
         await self.service_queues[service].put(query)
@@ -274,6 +276,10 @@ class CentralizedQueues:
         result = await query.async_future
 
         # asyncio.get_event_loop().create_task(query.on_complete(self))
+        router_name=request_meta.tracing_metadata.get("router_name", None)
+        tracer.add(
+            query.request_id, "router_recv_result", router_name=router_name
+        )
         if next_meta:
             service = next_meta.service
             query = self._make_query(next_meta, request_args, {'data': result})
@@ -448,11 +454,25 @@ class CentralizedQueues:
                             "kwarg_keys": list(request.request_kwargs.keys()),
                             "batch_size": None,
                             "call_method": "__call__",
+                            "request_id": request.request_id,
+                            "router_name": request.router_name
                         },
                         **request.request_kwargs,
                     },
                     num_return_vals=1,
                 )
+                '''ray_future = worker._ray_serve_call_ref._remote(
+                    args=[],
+                    kwargs={
+                        "metadata": {
+                            "kwarg_keys": list(request.request_kwargs.keys()),
+                            "batch_size": None,
+                            "call_method": "__call__"
+                        },
+                        **request.request_kwargs,
+                    },
+                    num_return_vals=1,
+                )'''
 
                 request.async_future.set_result(ray_future)
                 # future = worker._ray_serve_call.remote(request).as_future()
