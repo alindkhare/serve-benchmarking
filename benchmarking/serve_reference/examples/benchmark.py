@@ -9,8 +9,11 @@ import click
 import torch
 
 from benchmarking import serve_reference
-from benchmarking.utils import throughput_calculation, throughput_calculation_1
+from benchmarking.utils import throughput_calculation, throughput_calculation_1, get_latency
 
+from benchmarking import HTTPProxyActor
+import subprocess
+import os
 
 class ChainHandle:
     def __init__(self, handle_list):
@@ -30,7 +33,8 @@ class ChainHandle:
     "--return-type", type=click.Choice(["string", "torch"]), default="string"
 )
 def main(batch_size, num_warmups, num_queries, return_type):
-    serve_reference.init()
+    serve_reference.init(start_server=False)
+    # serve_reference.init()
 
     # def noop(_, *args, **kwargs):
     def noop(_, val):
@@ -53,8 +57,8 @@ def main(batch_size, num_warmups, num_queries, return_type):
 
     def noop2(_, data):
         # time.sleep(.01)
-        for _ in range(10000):
-            data += 1
+        # for _ in range(10000):
+        #     data += 1
         return data
 
     if batch_size:
@@ -75,49 +79,92 @@ def main(batch_size, num_warmups, num_queries, return_type):
         serve_reference.link("noop2", "noop2")
         handle2 = serve_reference.get_handle("noop2").options()
 
-    latency = []
     # Switch commenting of next two lines to use serve_reference
     handle = ChainHandle([handle, handle2])
     # handle.next_handle = handle2
-    for i in tqdm(range(num_warmups + num_queries)):
-        if i == num_warmups:
-            serve_reference.clear_trace()
 
-        start = time.perf_counter()
+    closed = True
+    qps = True
+    dump = False
+    open = True
+    if closed:
+        latency = []
+        for i in tqdm(range(num_warmups + num_queries)):
+            if i == num_warmups:
+                serve_reference.clear_trace()
 
-        if not batch_size:
-            future = handle.remote(data=1)
-            future = ray.get(future)
-            ray.get(future)
-            # ray.get(ray.get(
-                # This is how to pass a higher level metadata to the tracing
-                # context
-                # handle.remote(data=1)
-                # handle.remote(val=handle2.remote(val=1))
-                # handle.options(
-                #     tracing_metadata={"demo": "pipeline-id"}
-                # ).remote()
-            # ))
-        else:
-            ray.get(handle.enqueue_batch(data=[1] * batch_size))
-            # ray.get([handle.remote() for _ in range(batch_size)])
+            start = time.perf_counter()
 
-        end = time.perf_counter()
-        latency.append(end - start)
+            if not batch_size:
+                future = handle.remote(data=1)
+                future = ray.get(future)
+                ray.get(future)
+            else:
+                ray.get(handle.enqueue_batch(data=[1] * batch_size))
+                # ray.get([handle.remote() for _ in range(batch_size)])
 
-    # Remove initial samples
-    latency = latency[num_warmups:]
+            end = time.perf_counter()
+            latency.append(end - start)
 
-    series = pd.Series(latency) * 1000
-    print("Latency for single noop backend (ms)")
-    print(series.describe(percentiles=[0.5, 0.9, 0.95, 0.99]))
+        # Remove initial samples
+        latency = latency[num_warmups:]
 
-    qps = throughput_calculation_1(handle, {'data': 1}, num_queries)
-    print(f"Throughput: {qps}")
-    _, trace_file = tempfile.mkstemp(suffix=".json")
-    with open(trace_file, "w") as f:
-        json.dump(serve_reference.get_trace(), f)
-    print(f"trace file written to {trace_file}")
+        series = pd.Series(latency) * 1000
+        print("Closed Latency for two noop backend (ms)")
+        print(series.describe(percentiles=[0.5, 0.9, 0.95, 0.99]))
+
+    if qps:
+        qps = throughput_calculation_1(handle, {'data': 1}, num_queries)
+        print(f"Throughput: {qps}")
+
+    if dump:
+        _, trace_file = tempfile.mkstemp(suffix=".json")
+        with open(trace_file, "w") as f:
+            json.dump(serve_reference.get_trace(), f)
+        print(f"trace file written to {trace_file}")
+
+
+    if open:
+        filename_query = "arrival_trace.jsonl"
+        route = "/noop"
+        # handle
+        image_path = "elephant.jpg"
+        http_actor = HTTPProxyActor.remote(
+            host="127.0.0.1",
+            port=8000,
+            serving_backend="reference",
+            filename=filename_query,
+        )
+        ray.get(
+            http_actor.register_route.remote(
+                route, handle
+            )
+        )
+        go_client_path = "client.go"
+
+        arrival_curve = [10]*num_queries
+        arrival_curve_str = [str(x) for x in arrival_curve]
+        ls_output = subprocess.Popen(
+            [
+                "go",
+                "run",
+                go_client_path,
+                image_path,
+                route,
+                *arrival_curve_str,
+            ]
+        )
+        ls_output.communicate()
+
+        latency_s = get_latency(filename_query)
+        series = pd.Series(latency_s) * 1000
+        print("Open Loop Latency for two noop backend (ms)")
+        print(series.describe(percentiles=[0.5, 0.9, 0.95, 0.99]))
+        os.remove(filename_query)
+
+        # cleanup
+        # del latency_s, handle, arrival_curve, arrival_curve_str
+        # serve_reference.shutdown()
 
 
 if __name__ == "__main__":
